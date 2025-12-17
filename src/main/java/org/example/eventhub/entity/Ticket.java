@@ -28,6 +28,7 @@ public class Ticket {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TicketStatus status = TicketStatus.RESERVED;
 }

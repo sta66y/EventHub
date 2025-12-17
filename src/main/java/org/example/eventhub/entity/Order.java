@@ -32,7 +32,7 @@ public class Order {
     private List<Ticket> tickets = new ArrayList<>();
 
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @CreationTimestamp
     @Column(nullable = false)

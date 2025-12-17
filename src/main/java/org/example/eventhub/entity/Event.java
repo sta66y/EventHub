@@ -1,19 +1,20 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.eventhub.enums.EventStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -23,7 +24,7 @@ public class Event {
     private String title;
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "date_time")
     private LocalDateTime dateTime;
     @Embedded
     private Location location;
@@ -31,16 +32,16 @@ public class Event {
     @Column(nullable = false)
     private Integer capacity;
     @Column(nullable = false)
-    private BigDecimal price;
+    private BigDecimal price = BigDecimal.ZERO;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventStatus eventStatus = EventStatus.DRAFT;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets;
+    private List<Ticket> tickets = new ArrayList<>();
 }
