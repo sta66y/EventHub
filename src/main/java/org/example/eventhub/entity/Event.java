@@ -32,6 +32,7 @@ public class Event {
     @Column(nullable = false)
     private Integer capacity;
     @Column(nullable = false)
+    @Builder.Default
     private BigDecimal price = BigDecimal.ZERO;
 
     @ManyToOne(optional = false)
@@ -40,8 +41,10 @@ public class Event {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private EventStatus eventStatus = EventStatus.DRAFT;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
 }

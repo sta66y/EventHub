@@ -1,9 +1,7 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.eventhub.enums.OrderStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 public class Order {
 
     @Id
@@ -29,9 +29,11 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Column(nullable = false)
+    @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
 
     @Column(nullable = false)
+    @Builder.Default
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @CreationTimestamp
@@ -40,5 +42,6 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 }

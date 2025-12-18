@@ -1,9 +1,7 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.eventhub.enums.TicketStatus;
 
 
@@ -11,6 +9,8 @@ import org.example.eventhub.enums.TicketStatus;
 @NoArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -30,5 +30,6 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private TicketStatus status = TicketStatus.RESERVED;
 }
