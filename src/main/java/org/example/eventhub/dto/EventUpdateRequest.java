@@ -6,7 +6,7 @@ import org.example.eventhub.enums.EventStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record EventDtoRequest(
+public record EventUpdateRequest(
         String title,
         String description,
         LocalDateTime dateTime,
@@ -14,4 +14,5 @@ public record EventDtoRequest(
         Integer capacity,
         BigDecimal price,
         EventStatus eventStatus
-){}
+) {
+}
