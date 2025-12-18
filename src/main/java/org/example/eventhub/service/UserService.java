@@ -1,9 +1,10 @@
 package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.UserDtoRequest;
+import org.example.eventhub.dto.UserCreateRequest;
 import org.example.eventhub.dto.UserResponseLong;
 import org.example.eventhub.dto.UserResponseShort;
+import org.example.eventhub.dto.UserUpdateRequest;
 import org.example.eventhub.exception.UserAlreadyExists;
 import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
@@ -21,11 +22,11 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
 
-    public UserResponseLong createUser(UserDtoRequest dto) {
-        if (repository.findByUsername(dto.username()).isEmpty())
+    public UserResponseLong createUser(UserCreateRequest dto) {
+        if (repository.findByUsername(dto.username()).isPresent())
             throw new UserAlreadyExists("Пользователь с username " + dto.username() + " уже существует");
 
-        if (repository.findByEmail(dto.email()).isEmpty())
+        if (repository.findByEmail(dto.email()).isPresent())
             throw new UserAlreadyExists("Пользователь с email " + dto.email() + " уже существует");
 
         return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
@@ -40,12 +41,16 @@ public class UserService {
         return mapper.toLongDto(user);
      }
 
+    User getUserByIdAsEntity(Long id) {
+        return repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
+    }
+
     public UserResponseLong getUserByUsername(String username) {
         User user = repository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь с username " + username + " не найден"));
         return mapper.toLongDto(user);
     }
 
-    public UserResponseLong updateUser(Long id, UserDtoRequest dto) {
+    public UserResponseLong updateUser(Long id, UserUpdateRequest dto) {
         User user = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
 
         if (dto.username() != null) {
@@ -59,7 +64,7 @@ public class UserService {
             if (repository.findByEmail(dto.email()).isPresent())
                 throw new UserAlreadyExists("Пользователь с email " + dto.email() + " уже существует");
 
-            user.setUsername(dto.email());
+            user.setEmail(dto.email());
         }
 
         if (dto.password() != null) {
