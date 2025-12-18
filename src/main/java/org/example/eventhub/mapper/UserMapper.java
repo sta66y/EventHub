@@ -1,17 +1,16 @@
 package org.example.eventhub.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.UserDtoRequest;
+import org.example.eventhub.dto.UserCreateRequest;
 import org.example.eventhub.dto.UserResponseLong;
 import org.example.eventhub.dto.UserResponseShort;
+import org.example.eventhub.dto.UserUpdateRequest;
 import org.example.eventhub.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
-
-    private final EventMapper eventMapper;
 
     public UserResponseShort toShortDto(User user) {
         return new UserResponseShort(user.getUsername());
@@ -24,11 +23,11 @@ public class UserMapper {
                 user.getEmail(),
                 user.getRole(),
                 user.getCreatedAt(),
-                user.getOrganizedEvents().stream().map(eventMapper::toShortDto).toList()
+                user.getOrganizedEvents().size()
         );
     }
 
-    public User toEntity(UserDtoRequest dto) {
+    public User toEntity(UserCreateRequest dto) {
         return User.builder()
                 .username(dto.username())
                 .email(dto.email())

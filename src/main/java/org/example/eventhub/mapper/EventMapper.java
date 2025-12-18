@@ -1,11 +1,14 @@
 package org.example.eventhub.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.EventDtoRequest;
+import org.example.eventhub.dto.EventCreateRequest;
 import org.example.eventhub.dto.EventResponseLong;
 import org.example.eventhub.dto.EventResponseShort;
+import org.example.eventhub.dto.EventUpdateRequest;
 import org.example.eventhub.entity.Event;
 import org.springframework.stereotype.Component;
+import org.example.eventhub.entity.User;
+
 
 @Component
 @RequiredArgsConstructor
@@ -13,16 +16,20 @@ public class EventMapper {
 
     private final UserMapper userMapper;
 
-    public Event toEntity(EventDtoRequest dto) {
-        return new Event().builder()
+    public Event toEntity(EventCreateRequest dto, User organizer) {
+        Event event = Event.builder()
                 .title(dto.title())
-                .description(dto.description())
                 .dateTime(dto.dateTime())
-                .location(dto.location())
                 .capacity(dto.capacity())
-                .price(dto.price())
-                .eventStatus(dto.eventStatus())
+                .organizer(organizer)
                 .build();
+
+        if (dto.description() != null) event.setDescription(dto.description());
+        if (dto.location() != null) event.setLocation(dto.location());
+        if (dto.eventStatus() != null) event.setEventStatus(dto.eventStatus());
+        if (dto.price() != null) event.setPrice(dto.price());
+
+        return event;
     }
 
     public EventResponseLong toLongDto(Event entity) {
