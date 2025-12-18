@@ -37,7 +37,7 @@ public class EventController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EventResponseLong updateEvent(@PathVariable Long id, @Valid @RequestBody EventCreateRequest dto) {
+    public EventResponseLong updateEvent(@PathVariable Long id, @Valid @RequestBody EventUpdateRequest dto) {
         return service.updateEvent(id, dto);
     }
 
