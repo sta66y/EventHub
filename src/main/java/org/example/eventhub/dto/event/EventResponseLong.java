@@ -1,5 +1,6 @@
-package org.example.eventhub.dto;
+package org.example.eventhub.dto.event;
 
+import org.example.eventhub.dto.user.UserResponseShort;
 import org.example.eventhub.entity.Location;
 import org.example.eventhub.enums.EventStatus;
 

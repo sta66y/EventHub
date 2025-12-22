@@ -1,4 +1,4 @@
-package org.example.eventhub.dto;
+package org.example.eventhub.dto.user;
 
 import org.example.eventhub.enums.Role;
 
