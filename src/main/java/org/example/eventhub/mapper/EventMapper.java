@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.event.EventCreateRequest;
 import org.example.eventhub.dto.event.EventResponseLong;
 import org.example.eventhub.dto.event.EventResponseShort;
+import org.example.eventhub.dto.event.EventUpdateRequest;
 import org.example.eventhub.entity.Event;
+import org.example.eventhub.entity.Location;
 import org.springframework.stereotype.Component;
 import org.example.eventhub.entity.User;
 
@@ -14,6 +16,7 @@ import org.example.eventhub.entity.User;
 public class EventMapper {
 
     private final UserMapper userMapper;
+    private final LocationMapper locationMapper;
 
     public Event toEntity(EventCreateRequest dto, User user) {
         Event event = Event.builder()
@@ -24,11 +27,28 @@ public class EventMapper {
                 .build();
 
         if (dto.description() != null) event.setDescription(dto.description());
-        if (dto.location() != null) event.setLocation(dto.location());
+        if (dto.location() != null) event.setLocation(locationMapper.toEntity(dto.location()));
         if (dto.eventStatus() != null) event.setEventStatus(dto.eventStatus());
         if (dto.price() != null) event.setPrice(dto.price());
 
         return event;
+    }
+
+    public void updateEntity(EventUpdateRequest dto, Event event) {
+        if (dto.title() != null) event.setTitle(dto.title());
+        if (dto.description() != null) event.setDescription(dto.description());
+        if (dto.dateTime() != null) event.setDateTime(dto.dateTime());
+        if (dto.location() != null) {
+            Location location = event.getLocation();
+            if (dto.location().city() != null) location.setCity(dto.location().city());
+            if (dto.location().street() != null) location.setStreet(dto.location().street());
+            if (dto.location().house() != null) location.setHouse(dto.location().house());
+            if (dto.location().additionalInfo() != null) location.setAdditionalInfo(dto.location().additionalInfo());
+            event.setLocation(location);
+        }
+        if (dto.capacity() != null) event.setCapacity(dto.capacity());
+        if (dto.price() != null) event.setPrice(dto.price());
+        if (dto.eventStatus() != null) event.setEventStatus(dto.eventStatus());
     }
 
     public EventResponseLong toLongDto(Event entity) {
@@ -37,7 +57,7 @@ public class EventMapper {
                 entity.getTitle(),
                 entity.getDescription(),
                 entity.getDateTime(),
-                entity.getLocation(),
+                locationMapper.toLongDto(entity.getLocation()),
                 entity.getCapacity(),
                 entity.getPrice(),
                 entity.getEventStatus(),

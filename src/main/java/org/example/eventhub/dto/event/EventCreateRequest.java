@@ -3,7 +3,7 @@ package org.example.eventhub.dto.event;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import org.example.eventhub.entity.Location;
+import org.example.eventhub.dto.location.LocationCreateRequest;
 import org.example.eventhub.enums.EventStatus;
 
 import java.math.BigDecimal;
@@ -15,7 +15,7 @@ public record EventCreateRequest(
         String description,
         @NotNull(message = "dateTime обязателен")
         LocalDateTime dateTime,
-        Location location,
+        LocationCreateRequest location,
         @NotNull (message = "capacity обязательна")
         @Positive (message = "capacity должна быть положительна")
         Integer capacity,
