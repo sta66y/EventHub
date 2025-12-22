@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.eventhub.enums.TicketStatus;
 
+import java.math.BigDecimal;
+
 
 @Entity
 @NoArgsConstructor
@@ -24,12 +26,16 @@ public class Ticket {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private BigDecimal price = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private TicketStatus status = TicketStatus.RESERVED;
+    private TicketStatus status = TicketStatus.PAID;
 }

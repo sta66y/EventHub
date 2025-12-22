@@ -44,7 +44,7 @@ public class Event {
     @Builder.Default
     private EventStatus eventStatus = EventStatus.DRAFT;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
 }

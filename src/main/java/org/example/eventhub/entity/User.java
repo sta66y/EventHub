@@ -37,7 +37,7 @@ public class User {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true) //TODO подумать над удалением
+    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = false)
     @Builder.Default
     private List<Event> organizedEvents = new ArrayList<>();
 }

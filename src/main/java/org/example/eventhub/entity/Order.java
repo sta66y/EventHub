@@ -33,15 +33,14 @@ public class Order {
     private List<Ticket> tickets = new ArrayList<>();
 
     @Column(nullable = false)
-    @Builder.Default
-    private BigDecimal totalPrice = BigDecimal.ZERO;
+    private BigDecimal totalPrice;
 
     @CreationTimestamp
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status = OrderStatus.PAID;
 }
