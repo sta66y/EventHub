@@ -1,9 +1,6 @@
 package org.example.eventhub.controller;
 
-import org.example.eventhub.exception.EventAlreadyExists;
-import org.example.eventhub.exception.EventNotFoundException;
-import org.example.eventhub.exception.UserAlreadyExists;
-import org.example.eventhub.exception.UserNotFoundException;
+import org.example.eventhub.exception.*;
 import org.example.eventhub.model.AppError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +19,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserAlreadyExists.class)
-    public ResponseEntity<AppError> handleUserAlreadyExists(UserAlreadyExists ex) {
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<AppError> handleUserAlreadyExists(UserAlreadyExistsException ex) {
         return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
     }
 
@@ -32,9 +29,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(EventAlreadyExists.class)
-    public ResponseEntity<AppError> handleEventAlreadyExists(EventAlreadyExists ex) {
+    @ExceptionHandler(EventAlreadyExistsException.class)
+    public ResponseEntity<AppError> handleEventAlreadyExists(EventAlreadyExistsException ex) {
         return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoAvailableTicketsException.class)
+    public ResponseEntity<AppError> handleNoAvailableTickets(NoAvailableTicketsException ex) {
+        return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.CONFLICT.value()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<AppError> handleOrderNotFound(OrderNotFoundException ex) {
+        return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    public ResponseEntity<AppError> handleTicketNotFound(TicketNotFoundException ex) {
+        return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
