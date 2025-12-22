@@ -9,11 +9,12 @@ import org.example.eventhub.exception.UserAlreadyExistsException;
 import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
 import org.example.eventhub.repository.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.example.eventhub.entity.User;
 
-import java.util.List;
+import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +33,8 @@ public class UserService {
         return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
     }
 
-    public List<UserResponseShort> getAllUsers() { // TODO pageable
-        return repository.findAll().stream().map(mapper::toShortDto).toList();
+    public Page<UserResponseShort> getAllUsers(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toShortDto);
     }
 
      public UserResponseLong getUserById(Long id) {

@@ -12,6 +12,8 @@ import org.example.eventhub.enums.OrderStatus;
 import org.example.eventhub.exception.OrderNotFoundException;
 import org.example.eventhub.mapper.OrderMapper;
 import org.example.eventhub.repository.OrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +63,8 @@ public class OrderService {
         return mapper.toLongDto(order);
     }
 
-    public List<OrderResponseShort> getAllOrders(Long userId) {
-        return repository.findAllByUserId(userId).stream().map(mapper::toShortDto).toList();
+    public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) {
+        return repository.findAllByUserId(userId, pageable).map(mapper::toShortDto);
     }
 
     public OrderResponseLong cancelOrder(Long id) {

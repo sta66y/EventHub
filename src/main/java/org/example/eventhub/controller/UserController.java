@@ -7,10 +7,11 @@ import org.example.eventhub.dto.user.UserResponseLong;
 import org.example.eventhub.dto.user.UserResponseShort;
 import org.example.eventhub.dto.user.UserUpdateRequest;
 import org.example.eventhub.service.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.awt.print.Pageable;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -21,13 +22,13 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserResponseShort> getAllUsers() {
-        return service.getAllUsers();
+    public Page<UserResponseShort> getAllUsers(Pageable pageable) {
+        return service.getAllUsers(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseLong createUser(@Valid @RequestBody UserCreateRequest dto) { //TODO проверим количество event
+    public UserResponseLong createUser(@Valid @RequestBody UserCreateRequest dto) {
         return service.createUser(dto);
     }
 

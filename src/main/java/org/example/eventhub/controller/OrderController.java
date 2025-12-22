@@ -6,6 +6,8 @@ import org.example.eventhub.dto.order.OrderCreateRequest;
 import org.example.eventhub.dto.order.OrderResponseLong;
 import org.example.eventhub.dto.order.OrderResponseShort;
 import org.example.eventhub.service.OrderService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +34,8 @@ public class OrderController {
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderResponseShort> getAllOrders(@RequestParam Long userId) {
-        return service.getAllOrders(userId);
+    public Page<OrderResponseShort> getAllOrders(@RequestParam Long userId, Pageable pageable) {
+        return service.getAllOrders(userId, pageable);
     }
 
     @PostMapping("/{id}/cancel")

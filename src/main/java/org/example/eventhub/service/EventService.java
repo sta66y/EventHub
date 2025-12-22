@@ -9,12 +9,12 @@ import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.mapper.EventMapper;
 import org.example.eventhub.repository.EventRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.example.eventhub.entity.User;
 
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +43,8 @@ public class EventService {
         return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
     }
 
-    public List<EventResponseShort> getAllEvents() { // TODO pageable
-        return repository.findAll()
-                .stream()
-                .map(mapper::toShortDto)
-                .toList();
+    public Page<EventResponseShort> getAllEvents(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toShortDto);
     }
 
     public EventResponseLong updateEvent(Long id, EventUpdateRequest dto) {

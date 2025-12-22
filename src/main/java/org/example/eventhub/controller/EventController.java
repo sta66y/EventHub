@@ -7,10 +7,11 @@ import org.example.eventhub.dto.event.EventResponseLong;
 import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.dto.event.EventUpdateRequest;
 import org.example.eventhub.service.EventService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -21,13 +22,13 @@ public class EventController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventResponseShort> getAllEvents() {
-        return service.getAllEvents();
+    public Page<EventResponseShort> getAllEvents(Pageable pageable) {
+        return service.getAllEvents(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventResponseLong createEvent(@Valid @RequestBody EventCreateRequest dto, @RequestParam Long organizerId) { //TODO возможно проверку на то передан ли параметр
+    public EventResponseLong createEvent(@Valid @RequestBody EventCreateRequest dto, @RequestParam Long organizerId) {
         return service.createEvent(dto, organizerId);
     }
 
