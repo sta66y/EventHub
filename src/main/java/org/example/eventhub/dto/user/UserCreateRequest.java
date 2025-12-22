@@ -1,4 +1,4 @@
-package org.example.eventhub.dto;
+package org.example.eventhub.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
