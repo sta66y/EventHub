@@ -2,7 +2,10 @@ package org.example.eventhub.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.*;
+import org.example.eventhub.dto.event.EventCreateRequest;
+import org.example.eventhub.dto.event.EventResponseLong;
+import org.example.eventhub.dto.event.EventResponseShort;
+import org.example.eventhub.dto.event.EventUpdateRequest;
 import org.example.eventhub.service.EventService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +27,7 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventResponseLong createEvent(@Valid @RequestBody EventCreateRequest dto, @RequestParam Long organizerId) {
+    public EventResponseLong createEvent(@Valid @RequestBody EventCreateRequest dto, @RequestParam Long organizerId) { //TODO возможно проверку на то передан ли параметр
         return service.createEvent(dto, organizerId);
     }
 

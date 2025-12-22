@@ -2,10 +2,10 @@ package org.example.eventhub.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.UserCreateRequest;
-import org.example.eventhub.dto.UserResponseLong;
-import org.example.eventhub.dto.UserResponseShort;
-import org.example.eventhub.dto.UserUpdateRequest;
+import org.example.eventhub.dto.user.UserCreateRequest;
+import org.example.eventhub.dto.user.UserResponseLong;
+import org.example.eventhub.dto.user.UserResponseShort;
+import org.example.eventhub.dto.user.UserUpdateRequest;
 import org.example.eventhub.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseLong createUser(@Valid @RequestBody UserCreateRequest dto) {
+    public UserResponseLong createUser(@Valid @RequestBody UserCreateRequest dto) { //TODO проверим количество event
         return service.createUser(dto);
     }
 
@@ -45,7 +45,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponseLong updateUser(@PathVariable Long id, @Valid UserUpdateRequest dto) {
+    public UserResponseLong updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest dto) {
         return service.updateUser(id, dto);
     }
 
