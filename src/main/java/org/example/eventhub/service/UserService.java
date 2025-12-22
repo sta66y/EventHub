@@ -1,11 +1,11 @@
 package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.UserCreateRequest;
-import org.example.eventhub.dto.UserResponseLong;
-import org.example.eventhub.dto.UserResponseShort;
-import org.example.eventhub.dto.UserUpdateRequest;
-import org.example.eventhub.exception.UserAlreadyExists;
+import org.example.eventhub.dto.user.UserCreateRequest;
+import org.example.eventhub.dto.user.UserResponseLong;
+import org.example.eventhub.dto.user.UserResponseShort;
+import org.example.eventhub.dto.user.UserUpdateRequest;
+import org.example.eventhub.exception.UserAlreadyExistsException;
 import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
 import org.example.eventhub.repository.UserRepository;
@@ -24,10 +24,10 @@ public class UserService {
 
     public UserResponseLong createUser(UserCreateRequest dto) {
         if (repository.findByUsername(dto.username()).isPresent())
-            throw new UserAlreadyExists("Пользователь с username " + dto.username() + " уже существует");
+            throw new UserAlreadyExistsException("Пользователь с username " + dto.username() + " уже существует");
 
         if (repository.findByEmail(dto.email()).isPresent())
-            throw new UserAlreadyExists("Пользователь с email " + dto.email() + " уже существует");
+            throw new UserAlreadyExistsException("Пользователь с email " + dto.email() + " уже существует");
 
         return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
     }
@@ -55,14 +55,14 @@ public class UserService {
 
         if (dto.username() != null) {
             if (repository.findByUsername(dto.username()).isPresent())
-                throw new UserAlreadyExists("Пользователь с username " + dto.username() + " уже существует");
+                throw new UserAlreadyExistsException("Пользователь с username " + dto.username() + " уже существует");
 
             user.setUsername(dto.username());
         }
 
         if (dto.email() != null) {
             if (repository.findByEmail(dto.email()).isPresent())
-                throw new UserAlreadyExists("Пользователь с email " + dto.email() + " уже существует");
+                throw new UserAlreadyExistsException("Пользователь с email " + dto.email() + " уже существует");
 
             user.setEmail(dto.email());
         }
