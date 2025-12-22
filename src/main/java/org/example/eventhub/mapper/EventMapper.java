@@ -1,10 +1,9 @@
 package org.example.eventhub.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.EventCreateRequest;
-import org.example.eventhub.dto.EventResponseLong;
-import org.example.eventhub.dto.EventResponseShort;
-import org.example.eventhub.dto.EventUpdateRequest;
+import org.example.eventhub.dto.event.EventCreateRequest;
+import org.example.eventhub.dto.event.EventResponseLong;
+import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.entity.Event;
 import org.springframework.stereotype.Component;
 import org.example.eventhub.entity.User;
@@ -16,12 +15,12 @@ public class EventMapper {
 
     private final UserMapper userMapper;
 
-    public Event toEntity(EventCreateRequest dto, User organizer) {
+    public Event toEntity(EventCreateRequest dto, User user) {
         Event event = Event.builder()
                 .title(dto.title())
                 .dateTime(dto.dateTime())
                 .capacity(dto.capacity())
-                .organizer(organizer)
+                .organizer(user)
                 .build();
 
         if (dto.description() != null) event.setDescription(dto.description());
