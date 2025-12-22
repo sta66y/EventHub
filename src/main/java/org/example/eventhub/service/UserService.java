@@ -10,11 +10,10 @@ import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
 import org.example.eventhub.repository.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.example.eventhub.entity.User;
-
-import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor

@@ -8,10 +8,9 @@ import org.example.eventhub.dto.user.UserResponseShort;
 import org.example.eventhub.dto.user.UserUpdateRequest;
 import org.example.eventhub.service.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
 
 @RestController
 @RequestMapping("/api/v1/users")
