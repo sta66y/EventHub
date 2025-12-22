@@ -1,11 +1,11 @@
 package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.EventUpdateRequest;
+import org.example.eventhub.dto.event.EventUpdateRequest;
 import org.example.eventhub.exception.EventNotFoundException;
-import org.example.eventhub.dto.EventCreateRequest;
-import org.example.eventhub.dto.EventResponseLong;
-import org.example.eventhub.dto.EventResponseShort;
+import org.example.eventhub.dto.event.EventCreateRequest;
+import org.example.eventhub.dto.event.EventResponseLong;
+import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.mapper.EventMapper;
 import org.example.eventhub.repository.EventRepository;
@@ -37,6 +37,10 @@ public class EventService {
                 .orElseThrow(() -> new EventNotFoundException("Event с id" + id + " не найдено"));
 
         return mapper.toLongDto(event);
+    }
+
+    public Event getEventByIdAsEntity(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
     }
 
     public List<EventResponseShort> getAllEvents() { // TODO pageable
