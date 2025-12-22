@@ -24,11 +24,9 @@ public class UserService {
     private final UserMapper mapper;
 
     public UserResponseLong createUser(UserCreateRequest dto) {
-        if (repository.findByUsername(dto.username()).isPresent())
-            throw new UserAlreadyExistsException("Пользователь с username " + dto.username() + " уже существует");
+        checkIsUserAlreadyExistsByUsername(dto.username());
 
-        if (repository.findByEmail(dto.email()).isPresent())
-            throw new UserAlreadyExistsException("Пользователь с email " + dto.email() + " уже существует");
+        checkIsUserAlreadyExistsByEmail(dto.email());
 
         return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
     }
@@ -38,32 +36,28 @@ public class UserService {
     }
 
      public UserResponseLong getUserById(Long id) {
-        User user = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
+        User user = getUserByIdAsEntity(id);
         return mapper.toLongDto(user);
      }
 
-    User getUserByIdAsEntity(Long id) {
-        return repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
-    }
-
     public UserResponseLong getUserByUsername(String username) {
-        User user = repository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь с username " + username + " не найден"));
+        checkIsUserAlreadyExistsByUsername(username);
+
+        User user = repository.findByUsername(username).get();
         return mapper.toLongDto(user);
     }
 
     public UserResponseLong updateUser(Long id, UserUpdateRequest dto) {
-        User user = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
+        User user = getUserByIdAsEntity(id);
 
         if (dto.username() != null) {
-            if (repository.findByUsername(dto.username()).isPresent())
-                throw new UserAlreadyExistsException("Пользователь с username " + dto.username() + " уже существует");
+            checkIsUserAlreadyExistsByUsername(dto.username());
 
             user.setUsername(dto.username());
         }
 
         if (dto.email() != null) {
-            if (repository.findByEmail(dto.email()).isPresent())
-                throw new UserAlreadyExistsException("Пользователь с email " + dto.email() + " уже существует");
+            checkIsUserAlreadyExistsByEmail(dto.email());
 
             user.setEmail(dto.email());
         }
@@ -76,9 +70,23 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        if (repository.findById(id).isEmpty())
-            throw new UserNotFoundException("Пользователь с id " + id + " не найден");
+        getUserByIdAsEntity(id);
 
         repository.deleteById(id);
+    }
+
+    private void checkIsUserAlreadyExistsByUsername(String username) {
+        if (repository.findByUsername(username).isPresent())
+            throw new UserAlreadyExistsException("Пользователь с username " + username + " уже существует");
+    }
+
+    private void checkIsUserAlreadyExistsByEmail(String email) {
+        if (repository.findByEmail(email).isPresent())
+            throw new UserAlreadyExistsException("Пользователь с email " + email + " уже существует");
+    }
+
+    User getUserByIdAsEntity(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }
 }

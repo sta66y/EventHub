@@ -57,8 +57,7 @@ public class OrderService {
     }
 
     public OrderResponseLong getOrderById(Long id) {
-        Order order = repository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Ордера с id " + id + " не существует"));
+        Order order = getOrderByIdAsEntity(id);
 
         return mapper.toLongDto(order);
     }
@@ -68,11 +67,15 @@ public class OrderService {
     }
 
     public OrderResponseLong cancelOrder(Long id) {
-        Order order = repository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Ордера с id " + id + " не существует"));
+        Order order = getOrderByIdAsEntity(id);
 
         order.setStatus(OrderStatus.CANCELLED);
 
         return mapper.toLongDto(repository.save(order));
+    }
+
+    private Order getOrderByIdAsEntity(Long id) {
+        return  repository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Ордера с id " + id + " не существует"));
     }
 }
