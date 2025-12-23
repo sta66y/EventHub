@@ -4,14 +4,16 @@ import jakarta.persistence.criteria.Predicate;
 import org.example.eventhub.dto.event.EventFilter;
 import org.example.eventhub.entity.Event;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class EventSpecification {
 
-    public static Specification<Event> withFilter(EventFilter filter) {
+    public Specification<Event> withFilter(EventFilter filter) {
         return (root, query, cb) -> {
            if (filter == null) {
                return cb.conjunction();
