@@ -2,10 +2,7 @@ package org.example.eventhub.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.user.UserCreateRequest;
-import org.example.eventhub.dto.user.UserResponseLong;
-import org.example.eventhub.dto.user.UserResponseShort;
-import org.example.eventhub.dto.user.UserUpdateRequest;
+import org.example.eventhub.dto.user.*;
 import org.example.eventhub.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +18,8 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<UserResponseShort> getAllUsers(Pageable pageable) {
-        return service.getAllUsers(pageable);
+    public Page<UserResponseShort> getAllUsers(Pageable pageable, UserFilter filter) {
+        return service.getAllUsers(pageable, filter);
     }
 
     @PostMapping

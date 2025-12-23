@@ -23,6 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService {
 
     private final UserService userService;
@@ -33,7 +34,6 @@ public class OrderService {
     private final OrderRepository repository;
 
 
-    @Transactional
     public OrderResponseLong createOrder(OrderCreateRequest dto, Long userId) {
         User user = userService.getUserByIdAsEntity(userId);
 
@@ -62,7 +62,7 @@ public class OrderService {
         return mapper.toLongDto(order);
     }
 
-    public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) {
+    public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) { //TODO фильтрация
         return repository.findAllByUserId(userId, pageable).map(mapper::toShortDto);
     }
 

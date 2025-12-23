@@ -1,14 +1,13 @@
 package org.example.eventhub.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.user.UserCreateRequest;
-import org.example.eventhub.dto.user.UserResponseLong;
-import org.example.eventhub.dto.user.UserResponseShort;
-import org.example.eventhub.dto.user.UserUpdateRequest;
+import org.example.eventhub.dto.user.*;
 import org.example.eventhub.exception.UserAlreadyExistsException;
 import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
 import org.example.eventhub.repository.UserRepository;
+import org.example.eventhub.specification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,12 @@ import org.example.eventhub.entity.User;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final UserSpecification specification;
 
     public UserResponseLong createUser(UserCreateRequest dto) {
         checkIsUserAlreadyExistsByUsername(dto.username());
@@ -30,8 +31,8 @@ public class UserService {
         return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
     }
 
-    public Page<UserResponseShort> getAllUsers(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toShortDto);
+    public Page<UserResponseShort> getAllUsers(Pageable pageable, UserFilter filter) {
+        return repository.findAll(specification.withFilter(filter), pageable).map(mapper::toShortDto);
     }
 
      public UserResponseLong getUserById(Long id) {
@@ -40,22 +41,19 @@ public class UserService {
      }
 
     public UserResponseLong getUserByUsername(String username) {
-        checkIsUserAlreadyExistsByUsername(username);
-
-        User user = repository.findByUsername(username).get();
+        User user = getUserByUsernameAsEntity(username);
         return mapper.toLongDto(user);
     }
 
     public UserResponseLong updateUser(Long id, UserUpdateRequest dto) {
         User user = getUserByIdAsEntity(id);
 
-        if (dto.username() != null) {
+        if (dto.username() != null && !dto.username().equals(user.getUsername())) {
             checkIsUserAlreadyExistsByUsername(dto.username());
-
             user.setUsername(dto.username());
         }
 
-        if (dto.email() != null) {
+        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
             checkIsUserAlreadyExistsByEmail(dto.email());
 
             user.setEmail(dto.email());
@@ -87,5 +85,10 @@ public class UserService {
     User getUserByIdAsEntity(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
+    }
+
+    User getUserByUsernameAsEntity(String username) {
+        return repository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с username " + username + " не найден"));
     }
 }
