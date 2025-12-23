@@ -1,10 +1,8 @@
 package org.example.eventhub.repository;
 
 import org.example.eventhub.entity.Event;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface EventRepository extends JpaRepository<Event, Long> {
-    Page<Event> findAll(Pageable pageable);
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 }
