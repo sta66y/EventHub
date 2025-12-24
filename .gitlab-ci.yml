@@ -14,19 +14,14 @@ build-job:
 
 integration-test:
   stage: tests
+  tags:
+    - yandex-vps-runner
   dependencies:
     - build-job
-  image: docker:stable
-  services:
-    - docker:dind
+  image: maven:3.9.6-eclipse-temurin-21
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
     SPRING_PROFILES_ACTIVE: docker
   before_script:
-    - apt-get install -y docker.io
-    - apt-get update && apt-get install -y docker-compose-plugin
-    - docker info
     - docker compose up -d db
     - echo "ждем бд"
     - until docker compose exec -T db pg_isready -U postgres -d eventhub_db; do sleep 2; done
