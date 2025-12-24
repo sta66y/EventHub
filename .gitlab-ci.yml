@@ -1,10 +1,11 @@
 stages:
   - build
-  - tests
+  - test
 
 build-job:
   stage: build
-  image: maven:3.9.6-eclipse-temurin-21
+  tags:
+    - yandex-vps-runner
   script:
     - mvn clean package -DskipTests
   artifacts:
@@ -13,12 +14,11 @@ build-job:
     expire_in: 1 day
 
 integration-test:
-  stage: tests
+  stage: test
   tags:
     - yandex-vps-runner
   dependencies:
     - build-job
-  image: maven:3.9.6-eclipse-temurin-21
   variables:
     SPRING_PROFILES_ACTIVE: docker
   before_script:
