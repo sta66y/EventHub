@@ -62,7 +62,7 @@ public class OrderService {
         return mapper.toLongDto(order);
     }
 
-    public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) { //TODO фильтрация
+    public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) {
         return repository.findAllByUserId(userId, pageable).map(mapper::toShortDto);
     }
 
