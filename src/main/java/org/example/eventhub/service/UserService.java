@@ -82,7 +82,7 @@ public class UserService {
             throw new UserAlreadyExistsException("Пользователь с email " + email + " уже существует");
     }
 
-    User getUserByIdAsEntity(Long id) {
+    public User getUserByIdAsEntity(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }

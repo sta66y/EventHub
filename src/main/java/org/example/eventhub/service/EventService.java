@@ -2,11 +2,9 @@ package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.event.*;
-import org.example.eventhub.entity.Location;
 import org.example.eventhub.exception.EventNotFoundException;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.mapper.EventMapper;
-import org.example.eventhub.mapper.LocationMapper;
 import org.example.eventhub.repository.EventRepository;
 import org.example.eventhub.specification.EventSpecification;
 import org.springframework.data.domain.Page;
@@ -58,6 +56,7 @@ public class EventService {
 
 
     public Event getEventByIdAsEntity(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
+        return repository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
     }
 }

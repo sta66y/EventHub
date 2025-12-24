@@ -30,14 +30,12 @@ public class TicketService {
 
         checkIfThereAnyAvailableTickets(event);
 
-        Ticket ticket = Ticket.builder()
+        return Ticket.builder()
                 .order(order)
                 .event(event)
                 .user(user)
                 .price(event.getPrice())
                 .build();
-
-        return ticket;
     }
 
     public TicketResponseLong returnTicket(Long ticketId, Long userId) {
