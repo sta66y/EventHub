@@ -22,7 +22,6 @@ public class TicketService {
     private final TicketRepository repository;
     private final UserService userService;
     private final EventService eventService;
-    private final TicketMapper mapper;
 
     public Ticket createTicket(Long eventId, Long userId, Order order) {
         User user = userService.getUserByIdAsEntity(userId);
@@ -38,23 +37,8 @@ public class TicketService {
                 .build();
     }
 
-    public TicketResponseLong returnTicket(Long ticketId, Long userId) {
-        User user = userService.getUserByIdAsEntity(userId);
-
-        Ticket ticket = getTicketByIdAsEntity(ticketId);
-
-        ticket.setStatus(TicketStatus.CANCELLED);
-
-        return mapper.toLongDto(repository.save(ticket));
-    }
-
-    private Ticket getTicketByIdAsEntity(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new TicketNotFoundException("Билет с id " + id + " не найден"));
-    }
-
     private void checkIfThereAnyAvailableTickets(Event event) {
-        if (event.getCapacity() < repository.countActiveByEvent(event))
+        if (event.getCapacity() <= repository.countActiveByEvent(event))
             throw new NoAvailableTicketsException("Все билеты на мероприятие с id " + event.getId() + " уже распроданы");
     }
 }
