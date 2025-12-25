@@ -8,10 +8,14 @@ cache:
   paths:
     - .m2/repository
 
-build-job:
-  stage: build
+.vps-job:
   tags:
     - yandex-vps-runner
+
+
+build-job:
+  stage: build
+  extends: .vps-job
   script:
     - mvn clean package -DskipTests
   artifacts:
@@ -19,10 +23,9 @@ build-job:
       - target/*.jar
     expire_in: 1 day
 
-integration-test:
+test-job:
   stage: test
-  tags:
-    - yandex-vps-runner
+  extends: .vps-job
   dependencies:
     - build-job
   variables:
@@ -45,8 +48,7 @@ integration-test:
 
 deploy:
   stage: deploy
-  tags:
-    - yandex-vps-runner
+  extends: .vps-job
   dependencies:
     - build-job
   script:
