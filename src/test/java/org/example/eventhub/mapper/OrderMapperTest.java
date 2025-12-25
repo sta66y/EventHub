@@ -1,5 +1,12 @@
 package org.example.eventhub.mapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.dto.order.OrderResponseLong;
 import org.example.eventhub.dto.order.OrderResponseShort;
 import org.example.eventhub.dto.ticket.TicketResponseShort;
@@ -8,7 +15,6 @@ import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.OrderStatus;
-import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.enums.TicketStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,13 +23,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderMapperTest {
@@ -77,12 +76,7 @@ class OrderMapperTest {
         when(ticketMapper.toShortDto(ticket2)).thenReturn(ticketShort2);
 
         OrderResponseLong expected = new OrderResponseLong(
-                1L,
-                userShort,
-                List.of(ticketShort1, ticketShort2),
-                BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+                1L, userShort, List.of(ticketShort1, ticketShort2), BigDecimal.valueOf(3500), OrderStatus.PENDING);
 
         OrderResponseLong actual = orderMapper.toLongDto(order);
 
@@ -96,10 +90,7 @@ class OrderMapperTest {
         when(ticketMapper.toShortDto(ticket2)).thenReturn(ticketShort2);
 
         OrderResponseShort expected = new OrderResponseShort(
-                List.of(ticketShort1, ticketShort2),
-                BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+                List.of(ticketShort1, ticketShort2), BigDecimal.valueOf(3500), OrderStatus.PENDING);
 
         OrderResponseShort actual = orderMapper.toShortDto(order);
 
@@ -112,13 +103,8 @@ class OrderMapperTest {
         when(userMapper.toShortDto(user)).thenReturn(userShort);
         order.setTickets(List.of());
 
-        OrderResponseLong expected = new OrderResponseLong(
-                1L,
-                userShort,
-                List.of(),
-                BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+        OrderResponseLong expected =
+                new OrderResponseLong(1L, userShort, List.of(), BigDecimal.valueOf(3500), OrderStatus.PENDING);
 
         assertEquals(expected, orderMapper.toLongDto(order));
     }
@@ -128,11 +114,7 @@ class OrderMapperTest {
     void toShortDto_handlesEmptyTicketsList() {
         order.setTickets(List.of());
 
-        OrderResponseShort expected = new OrderResponseShort(
-                List.of(),
-                BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+        OrderResponseShort expected = new OrderResponseShort(List.of(), BigDecimal.valueOf(3500), OrderStatus.PENDING);
 
         assertEquals(expected, orderMapper.toShortDto(order));
     }
