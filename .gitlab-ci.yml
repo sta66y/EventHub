@@ -3,6 +3,11 @@ stages:
   - test
   - deploy
 
+cache:
+  key: maven-cache
+  paths:
+    - .m2/repository
+
 build-job:
   stage: build
   tags:
@@ -22,8 +27,6 @@ integration-test:
     - build-job
   variables:
     SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:6666/eventhub_db
-    SPRING_DATASOURCE_USERNAME: postgres
-    SPRING_DATASOURCE_PASSWORD: postgres
   before_script:
     - docker compose down || true
     - docker compose up -d db
