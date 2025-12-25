@@ -3,17 +3,14 @@ package org.example.eventhub.specification;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
-import org.example.eventhub.dto.user.UserFilter;
-import org.example.eventhub.entity.Event;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
-
-import org.example.eventhub.entity.User;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import org.example.eventhub.dto.user.UserFilter;
+import org.example.eventhub.entity.Event;
+import org.example.eventhub.entity.User;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserSpecification {
@@ -28,31 +25,19 @@ public class UserSpecification {
 
             if (filter.username() != null && !filter.username().isBlank()) {
                 String lowerUsername = filter.username().toLowerCase(Locale.ROOT);
-                predicates.add(cb.like(
-                        cb.lower(root.get("username")),
-                        "%" + lowerUsername + "%"
-                ));
+                predicates.add(cb.like(cb.lower(root.get("username")), "%" + lowerUsername + "%"));
             }
 
             if (filter.role() != null) {
-                predicates.add(cb.equal(
-                        root.get("role"),
-                        filter.role()
-                ));
+                predicates.add(cb.equal(root.get("role"), filter.role()));
             }
 
             if (filter.fromCreatedAt() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(
-                        root.get("createdAt"),
-                        filter.fromCreatedAt()
-                ));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.fromCreatedAt()));
             }
 
             if (filter.toCreatedAt() != null) {
-                predicates.add(cb.lessThanOrEqualTo(
-                        root.get("createdAt"),
-                        filter.toCreatedAt()
-                ));
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.toCreatedAt()));
             }
 
             if (filter.minOrganizedEvents() != null || filter.maxOrganizedEvents() != null) {
@@ -62,10 +47,12 @@ public class UserSpecification {
                 subquery.where(cb.equal(eventRoot.get("organizer"), root));
 
                 if (filter.minOrganizedEvents() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(subquery, filter.minOrganizedEvents().longValue()));
+                    predicates.add(cb.greaterThanOrEqualTo(
+                            subquery, filter.minOrganizedEvents().longValue()));
                 }
                 if (filter.maxOrganizedEvents() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(subquery, filter.maxOrganizedEvents().longValue()));
+                    predicates.add(cb.lessThanOrEqualTo(
+                            subquery, filter.maxOrganizedEvents().longValue()));
                 }
             }
 

@@ -1,19 +1,13 @@
 package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.ticket.TicketResponseLong;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
-import org.example.eventhub.enums.TicketStatus;
+import org.example.eventhub.entity.User;
 import org.example.eventhub.exception.NoAvailableTicketsException;
-import org.example.eventhub.exception.TicketNotFoundException;
-import org.example.eventhub.mapper.TicketMapper;
 import org.example.eventhub.repository.TicketRepository;
 import org.springframework.stereotype.Service;
-
-import org.example.eventhub.entity.User;
-
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +33,7 @@ public class TicketService {
 
     private void checkIfThereAnyAvailableTickets(Event event) {
         if (event.getCapacity() <= repository.countActiveByEvent(event))
-            throw new NoAvailableTicketsException("Все билеты на мероприятие с id " + event.getId() + " уже распроданы");
+            throw new NoAvailableTicketsException(
+                    "Все билеты на мероприятие с id " + event.getId() + " уже распроданы");
     }
 }

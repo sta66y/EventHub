@@ -1,14 +1,13 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.example.eventhub.enums.OrderStatus;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import org.example.eventhub.enums.OrderStatus;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "orders")

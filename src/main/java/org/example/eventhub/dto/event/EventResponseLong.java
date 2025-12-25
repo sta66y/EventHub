@@ -1,11 +1,10 @@
 package org.example.eventhub.dto.event;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import org.example.eventhub.dto.location.LocationResponseLong;
 import org.example.eventhub.dto.user.UserResponseShort;
 import org.example.eventhub.enums.EventStatus;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record EventResponseLong(
         Long id,
@@ -16,5 +15,4 @@ public record EventResponseLong(
         Integer capacity,
         BigDecimal price,
         EventStatus eventStatus,
-        UserResponseShort organizer
-) {}
+        UserResponseShort organizer) {}

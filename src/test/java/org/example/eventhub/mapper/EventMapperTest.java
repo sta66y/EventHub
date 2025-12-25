@@ -1,5 +1,10 @@
 package org.example.eventhub.mapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import org.example.eventhub.dto.event.*;
 import org.example.eventhub.dto.location.LocationCreateRequest;
 import org.example.eventhub.dto.location.LocationResponseLong;
@@ -16,12 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventMapperTest {
@@ -44,10 +43,7 @@ class EventMapperTest {
 
     @BeforeEach
     void setUp() {
-        organizer = User.builder()
-                .id(10L)
-                .username("organizer")
-                .build();
+        organizer = User.builder().id(10L).username("organizer").build();
 
         location = Location.builder()
                 .city("Moscow")
@@ -75,8 +71,7 @@ class EventMapperTest {
                 new LocationCreateRequest("SPb", "Nevsky", "5", null),
                 300,
                 BigDecimal.valueOf(2000),
-                EventStatus.DRAFT
-        );
+                EventStatus.DRAFT);
 
         updateRequest = new EventUpdateRequest(
                 "Updated Title",
@@ -85,18 +80,13 @@ class EventMapperTest {
                 new LocationUpdateRequest("Kazan", null, null, "center"),
                 400,
                 BigDecimal.valueOf(2500),
-                EventStatus.PUBLISHED
-        );
+                EventStatus.PUBLISHED);
     }
 
     @Test
     @DisplayName("toShortDto: возвращает правильный Short DTO")
     void toShortDto_shouldReturnCorrectDto() {
-        EventResponseShort expected = new EventResponseShort(
-                1L,
-                "Concert",
-                LocalDateTime.of(2026, 1, 15, 20, 0)
-        );
+        EventResponseShort expected = new EventResponseShort(1L, "Concert", LocalDateTime.of(2026, 1, 15, 20, 0));
 
         assertEquals(expected, eventMapper.toShortDto(event));
     }
@@ -119,8 +109,7 @@ class EventMapperTest {
                 500,
                 BigDecimal.valueOf(3000),
                 EventStatus.PUBLISHED,
-                organizerShort
-        );
+                organizerShort);
 
         assertEquals(expected, eventMapper.toLongDto(event));
 
@@ -180,9 +169,7 @@ class EventMapperTest {
     @Test
     @DisplayName("updateEntity: не меняет поля, если они null в UpdateRequest")
     void updateEntity_shouldNotChangeFieldsWhenNull() {
-        EventUpdateRequest partial = new EventUpdateRequest(
-                null, null, null, null, null, null, null
-        );
+        EventUpdateRequest partial = new EventUpdateRequest(null, null, null, null, null, null, null);
 
         String originalTitle = event.getTitle();
         LocalDateTime originalDate = event.getDateTime();

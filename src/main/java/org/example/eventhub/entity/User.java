@@ -1,13 +1,12 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.example.eventhub.enums.Role;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import org.example.eventhub.enums.Role;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "users")
@@ -23,15 +22,18 @@ public class User {
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
+
     @Column(nullable = false, unique = true, length = 100)
     private String email;
+
     @Column(nullable = false)
-    private String password; //TODO шифровать
+    private String password; // TODO шифровать
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     @Builder.Default

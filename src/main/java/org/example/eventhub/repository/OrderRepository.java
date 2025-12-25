@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(
             value = "SELECT o FROM Order o WHERE o.user.id = :userId",
-            countQuery = "SELECT count(*) FROM Order o WHERE o.user.id = :userId"
-    )
+            countQuery = "SELECT count(*) FROM Order o WHERE o.user.id = :userId")
     Page<Order> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }

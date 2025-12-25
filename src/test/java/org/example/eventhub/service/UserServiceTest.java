@@ -1,5 +1,12 @@
 package org.example.eventhub.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.example.eventhub.dto.user.*;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.Role;
@@ -13,14 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
@@ -52,30 +51,14 @@ class UserServiceTest {
         user.setEmail(EXISTING_EMAIL);
         user.setPassword("oldPassword");
 
-        createRequest = new UserCreateRequest(
-                "new_user",
-                "new@example.com",
-                "password123"
-        );
+        createRequest = new UserCreateRequest("new_user", "new@example.com", "password123");
 
-        updateRequest = new UserUpdateRequest(
-                NEW_USERNAME,
-                NEW_EMAIL,
-                "newPassword"
-        );
+        updateRequest = new UserUpdateRequest(NEW_USERNAME, NEW_EMAIL, "newPassword");
 
         responseLong = new UserResponseLong(
-                EXISTING_ID,
-                EXISTING_USERNAME,
-                EXISTING_EMAIL,
-                Role.USER,
-                LocalDateTime.now(),
-                10
-        );
+                EXISTING_ID, EXISTING_USERNAME, EXISTING_EMAIL, Role.USER, LocalDateTime.now(), 10);
 
-        responseShort = new UserResponseShort(
-                EXISTING_USERNAME
-        );
+        responseShort = new UserResponseShort(EXISTING_USERNAME);
 
         pageable = PageRequest.of(0, 10);
     }
@@ -102,8 +85,8 @@ class UserServiceTest {
     void createUser_usernameAlreadyExists() {
         when(repository.findByUsername(createRequest.username())).thenReturn(Optional.of(user));
 
-        UserAlreadyExistsException ex = assertThrows(UserAlreadyExistsException.class,
-                () -> userService.createUser(createRequest));
+        UserAlreadyExistsException ex =
+                assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createRequest));
 
         assertEquals("Пользователь с username " + createRequest.username() + " уже существует", ex.getMessage());
         verify(repository, never()).save(any());
@@ -115,8 +98,8 @@ class UserServiceTest {
         when(repository.findByUsername(createRequest.username())).thenReturn(Optional.empty());
         when(repository.findByEmail(createRequest.email())).thenReturn(Optional.of(user));
 
-        UserAlreadyExistsException ex = assertThrows(UserAlreadyExistsException.class,
-                () -> userService.createUser(createRequest));
+        UserAlreadyExistsException ex =
+                assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createRequest));
 
         assertEquals("Пользователь с email " + createRequest.email() + " уже существует", ex.getMessage());
         verify(repository, never()).save(any());
@@ -128,9 +111,7 @@ class UserServiceTest {
     @DisplayName("getAllUsers: возвращает страницу Short DTO с фильтром")
     void getAllUsers_returnsPage() {
         Page<User> page = new PageImpl<>(List.of(user), pageable, 1);
-        UserFilter filter = new UserFilter(
-                "john", null, null, null, null, null
-        );
+        UserFilter filter = new UserFilter("john", null, null, null, null, null);
 
         when(repository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
         when(mapper.toShortDto(user)).thenReturn(responseShort);
@@ -172,8 +153,8 @@ class UserServiceTest {
     void getUserById_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        UserNotFoundException ex = assertThrows(UserNotFoundException.class,
-                () -> userService.getUserById(NON_EXISTING_ID));
+        UserNotFoundException ex =
+                assertThrows(UserNotFoundException.class, () -> userService.getUserById(NON_EXISTING_ID));
 
         assertEquals("Пользователь с id " + NON_EXISTING_ID + " не найден", ex.getMessage());
     }
@@ -196,8 +177,8 @@ class UserServiceTest {
     void getUserByUsername_notFound() {
         when(repository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-        UserNotFoundException ex = assertThrows(UserNotFoundException.class,
-                () -> userService.getUserByUsername("unknown"));
+        UserNotFoundException ex =
+                assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername("unknown"));
 
         assertEquals("Пользователь с username unknown не найден", ex.getMessage());
     }
@@ -248,8 +229,7 @@ class UserServiceTest {
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(user));
         when(repository.findByUsername("taken_user")).thenReturn(Optional.of(anotherUser));
 
-        assertThrows(UserAlreadyExistsException.class,
-                () -> userService.updateUser(EXISTING_ID, badRequest));
+        assertThrows(UserAlreadyExistsException.class, () -> userService.updateUser(EXISTING_ID, badRequest));
     }
 
     // ====================== deleteUser ======================
@@ -269,7 +249,6 @@ class UserServiceTest {
     void deleteUser_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class,
-                () -> userService.deleteUser(NON_EXISTING_ID));
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(NON_EXISTING_ID));
     }
 }

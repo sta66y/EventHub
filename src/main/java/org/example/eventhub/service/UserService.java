@@ -3,6 +3,7 @@ package org.example.eventhub.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.user.*;
+import org.example.eventhub.entity.User;
 import org.example.eventhub.exception.UserAlreadyExistsException;
 import org.example.eventhub.exception.UserNotFoundException;
 import org.example.eventhub.mapper.UserMapper;
@@ -11,8 +12,6 @@ import org.example.eventhub.specification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import org.example.eventhub.entity.User;
 
 @Service
 @RequiredArgsConstructor
@@ -35,10 +34,10 @@ public class UserService {
         return repository.findAll(specification.withFilter(filter), pageable).map(mapper::toShortDto);
     }
 
-     public UserResponseLong getUserById(Long id) {
+    public UserResponseLong getUserById(Long id) {
         User user = getUserByIdAsEntity(id);
         return mapper.toLongDto(user);
-     }
+    }
 
     public UserResponseLong getUserByUsername(String username) {
         User user = getUserByUsernameAsEntity(username);
@@ -83,12 +82,14 @@ public class UserService {
     }
 
     public User getUserByIdAsEntity(Long id) {
-        return repository.findById(id)
+        return repository
+                .findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }
 
     User getUserByUsernameAsEntity(String username) {
-        return repository.findByUsername(username)
+        return repository
+                .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с username " + username + " не найден"));
     }
 }

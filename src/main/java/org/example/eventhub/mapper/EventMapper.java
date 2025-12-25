@@ -7,9 +7,8 @@ import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.dto.event.EventUpdateRequest;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Location;
-import org.springframework.stereotype.Component;
 import org.example.eventhub.entity.User;
-
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -41,9 +40,11 @@ public class EventMapper {
         if (dto.location() != null) {
             Location location = event.getLocation();
             if (dto.location().city() != null) location.setCity(dto.location().city());
-            if (dto.location().street() != null) location.setStreet(dto.location().street());
+            if (dto.location().street() != null)
+                location.setStreet(dto.location().street());
             if (dto.location().house() != null) location.setHouse(dto.location().house());
-            if (dto.location().additionalInfo() != null) location.setAdditionalInfo(dto.location().additionalInfo());
+            if (dto.location().additionalInfo() != null)
+                location.setAdditionalInfo(dto.location().additionalInfo());
             event.setLocation(location);
         }
         if (dto.capacity() != null) event.setCapacity(dto.capacity());
@@ -61,15 +62,10 @@ public class EventMapper {
                 entity.getCapacity(),
                 entity.getPrice(),
                 entity.getEventStatus(),
-                userMapper.toShortDto(entity.getOrganizer())
-        );
+                userMapper.toShortDto(entity.getOrganizer()));
     }
 
     public EventResponseShort toShortDto(Event entity) {
-        return new EventResponseShort(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getDateTime()
-        );
+        return new EventResponseShort(entity.getId(), entity.getTitle(), entity.getDateTime());
     }
 }

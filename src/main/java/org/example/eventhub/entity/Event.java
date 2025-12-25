@@ -1,13 +1,12 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.example.eventhub.enums.EventStatus;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import org.example.eventhub.enums.EventStatus;
 
 @Entity
 @NoArgsConstructor
@@ -22,15 +21,18 @@ public class Event {
 
     @Column(nullable = false)
     private String title;
+
     private String description;
 
     @Column(nullable = false, name = "date_time")
     private LocalDateTime dateTime;
+
     @Embedded
     private Location location;
 
     @Column(nullable = false)
     private Integer capacity;
+
     @Column(nullable = false)
     @Builder.Default
     private BigDecimal price = BigDecimal.ZERO;

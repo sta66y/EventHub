@@ -22,8 +22,7 @@ public class UserMapper {
                 entity.getEmail(),
                 entity.getRole(),
                 entity.getCreatedAt(),
-                entity.getOrganizedEvents().size()
-        );
+                entity.getOrganizedEvents().size());
     }
 
     public User toEntity(UserCreateRequest dto) {

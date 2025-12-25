@@ -1,11 +1,9 @@
 package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 import org.example.eventhub.enums.TicketStatus;
-
-import java.math.BigDecimal;
-
 
 @Entity
 @NoArgsConstructor

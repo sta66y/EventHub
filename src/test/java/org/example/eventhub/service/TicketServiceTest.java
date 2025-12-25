@@ -1,5 +1,9 @@
 package org.example.eventhub.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
@@ -9,11 +13,6 @@ import org.example.eventhub.repository.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TicketServiceTest {
 
@@ -41,9 +40,7 @@ class TicketServiceTest {
         event.setCapacity(100);
         event.setPrice(BigDecimal.valueOf(2500));
 
-        order = Order.builder()
-                .id(ORDER_ID)
-                .build();
+        order = Order.builder().id(ORDER_ID).build();
     }
 
     @Test
@@ -75,14 +72,9 @@ class TicketServiceTest {
         when(repository.countActiveByEvent(event)).thenReturn(100);
 
         NoAvailableTicketsException ex = assertThrows(
-                NoAvailableTicketsException.class,
-                () -> ticketService.createTicket(EVENT_ID, USER_ID, order)
-        );
+                NoAvailableTicketsException.class, () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
 
-        assertEquals(
-                "Все билеты на мероприятие с id " + EVENT_ID + " уже распроданы",
-                ex.getMessage()
-        );
+        assertEquals("Все билеты на мероприятие с id " + EVENT_ID + " уже распроданы", ex.getMessage());
 
         verify(userService).getUserByIdAsEntity(USER_ID);
         verify(eventService).getEventByIdAsEntity(EVENT_ID);
@@ -97,8 +89,7 @@ class TicketServiceTest {
 
         when(repository.countActiveByEvent(event)).thenReturn(101);
 
-        assertThrows(NoAvailableTicketsException.class,
-                () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
+        assertThrows(NoAvailableTicketsException.class, () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
 
         verify(repository).countActiveByEvent(event);
     }

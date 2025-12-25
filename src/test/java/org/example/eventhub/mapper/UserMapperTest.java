@@ -1,20 +1,18 @@
 package org.example.eventhub.mapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import org.example.eventhub.dto.user.UserCreateRequest;
 import org.example.eventhub.dto.user.UserResponseLong;
 import org.example.eventhub.dto.user.UserResponseShort;
 import org.example.eventhub.entity.Event;
+import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import org.example.eventhub.entity.User;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserMapperTest {
 
@@ -36,11 +34,7 @@ public class UserMapperTest {
                 .organizedEvents(organizedEvents)
                 .build();
 
-        createRequest = new UserCreateRequest(
-                "new_user",
-                "new@example.com",
-                "pass123"
-        );
+        createRequest = new UserCreateRequest("new_user", "new@example.com", "pass123");
     }
 
     @Test
@@ -55,10 +49,7 @@ public class UserMapperTest {
     @DisplayName("toLongDto: должен вернуть правильное long DTO")
     void toLongDto_shouldReturnRightDto() {
         UserResponseLong dto = new UserResponseLong(
-                1L, "john_doe", "john@example.com",
-                Role.USER, LocalDateTime.of(2025, 1, 1, 12, 0),
-                2
-        );
+                1L, "john_doe", "john@example.com", Role.USER, LocalDateTime.of(2025, 1, 1, 12, 0), 2);
 
         assertEquals(dto, mapper.toLongDto(user));
     }

@@ -2,18 +2,16 @@ package org.example.eventhub.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.event.*;
-import org.example.eventhub.exception.EventNotFoundException;
 import org.example.eventhub.entity.Event;
+import org.example.eventhub.entity.User;
+import org.example.eventhub.exception.EventNotFoundException;
 import org.example.eventhub.mapper.EventMapper;
 import org.example.eventhub.repository.EventRepository;
 import org.example.eventhub.specification.EventSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import org.example.eventhub.entity.User;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,9 @@ public class EventService {
     }
 
     public Page<EventResponseShort> getAllEvents(Pageable pageable, EventFilter eventFilter) {
-        return repository.findAll(specification.withFilter(eventFilter), pageable).map(mapper::toShortDto);
+        return repository
+                .findAll(specification.withFilter(eventFilter), pageable)
+                .map(mapper::toShortDto);
     }
 
     public EventResponseLong updateEvent(Long id, EventUpdateRequest dto) {
@@ -54,9 +54,7 @@ public class EventService {
         repository.deleteById(id);
     }
 
-
     public Event getEventByIdAsEntity(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
+        return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
     }
 }

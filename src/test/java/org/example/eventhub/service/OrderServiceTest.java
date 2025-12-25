@@ -1,11 +1,20 @@
 package org.example.eventhub.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.dto.order.OrderCreateRequest;
 import org.example.eventhub.dto.order.OrderResponseLong;
 import org.example.eventhub.dto.order.OrderResponseShort;
 import org.example.eventhub.dto.ticket.TicketResponseShort;
 import org.example.eventhub.dto.user.UserResponseShort;
-import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
@@ -18,16 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
 
 class OrderServiceTest {
 
@@ -80,17 +79,9 @@ class OrderServiceTest {
 
         createRequest = new OrderCreateRequest(List.of(100L, 200L));
 
-        eventShort1 = new EventResponseShort(
-                100L,
-                "Rock Concert",
-                LocalDateTime.of(2026, 1, 15, 20, 0)
-        );
+        eventShort1 = new EventResponseShort(100L, "Rock Concert", LocalDateTime.of(2026, 1, 15, 20, 0));
 
-        eventShort2 = new EventResponseShort(
-                200L,
-                "Jazz Evening",
-                LocalDateTime.of(2026, 2, 20, 19, 30)
-        );
+        eventShort2 = new EventResponseShort(200L, "Jazz Evening", LocalDateTime.of(2026, 2, 20, 19, 30));
 
         userShort = new UserResponseShort("john_doe");
 
@@ -102,14 +93,10 @@ class OrderServiceTest {
                 userShort,
                 List.of(ticketShort1, ticketShort2),
                 BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+                OrderStatus.PENDING);
 
         responseShort = new OrderResponseShort(
-                List.of(ticketShort1, ticketShort2),
-                BigDecimal.valueOf(3500),
-                OrderStatus.PENDING
-        );
+                List.of(ticketShort1, ticketShort2), BigDecimal.valueOf(3500), OrderStatus.PENDING);
 
         pageable = PageRequest.of(0, 10);
     }
@@ -119,8 +106,10 @@ class OrderServiceTest {
     void createOrder_success() {
         when(userService.getUserByIdAsEntity(USER_ID)).thenReturn(user);
 
-        when(ticketService.createTicket(eq(100L), eq(USER_ID), any(Order.class))).thenReturn(ticket1);
-        when(ticketService.createTicket(eq(200L), eq(USER_ID), any(Order.class))).thenReturn(ticket2);
+        when(ticketService.createTicket(eq(100L), eq(USER_ID), any(Order.class)))
+                .thenReturn(ticket1);
+        when(ticketService.createTicket(eq(200L), eq(USER_ID), any(Order.class)))
+                .thenReturn(ticket2);
 
         when(repository.save(any(Order.class))).thenAnswer(invocation -> {
             Order saved = invocation.getArgument(0);
@@ -138,10 +127,9 @@ class OrderServiceTest {
         assertEquals(userShort, result.user());
 
         verify(ticketService, times(2)).createTicket(anyLong(), eq(USER_ID), any(Order.class));
-        verify(repository).save(argThat(o ->
-                o.getTickets().size() == 2 &&
-                        o.getTotalPrice().compareTo(BigDecimal.valueOf(3500)) == 0
-        ));
+        verify(repository)
+                .save(argThat(
+                        o -> o.getTickets().size() == 2 && o.getTotalPrice().compareTo(BigDecimal.valueOf(3500)) == 0));
     }
 
     @Test
@@ -162,8 +150,8 @@ class OrderServiceTest {
     void getOrderById_notFound() {
         when(repository.findById(NON_EXISTING_ORDER_ID)).thenReturn(Optional.empty());
 
-        OrderNotFoundException ex = assertThrows(OrderNotFoundException.class,
-                () -> orderService.getOrderById(NON_EXISTING_ORDER_ID));
+        OrderNotFoundException ex =
+                assertThrows(OrderNotFoundException.class, () -> orderService.getOrderById(NON_EXISTING_ORDER_ID));
 
         assertEquals("Ордера с id " + NON_EXISTING_ORDER_ID + " не существует", ex.getMessage());
     }
@@ -217,8 +205,7 @@ class OrderServiceTest {
                 userShort,
                 List.of(ticketShort1, ticketShort2),
                 BigDecimal.valueOf(3500),
-                OrderStatus.CANCELLED
-        );
+                OrderStatus.CANCELLED);
 
         when(mapper.toLongDto(cancelledOrder)).thenReturn(cancelledResponse);
 
@@ -235,7 +222,6 @@ class OrderServiceTest {
     void cancelOrder_notFound() {
         when(repository.findById(NON_EXISTING_ORDER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(OrderNotFoundException.class,
-                () -> orderService.cancelOrder(NON_EXISTING_ORDER_ID));
+        assertThrows(OrderNotFoundException.class, () -> orderService.cancelOrder(NON_EXISTING_ORDER_ID));
     }
 }

@@ -1,5 +1,13 @@
 package org.example.eventhub.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.example.eventhub.dto.event.*;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.User;
@@ -13,15 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class EventServiceTest {
 
@@ -37,9 +36,7 @@ class EventServiceTest {
 
     private final EventSpecification realSpecification = new EventSpecification();
 
-    private final EventService eventService = new EventService(
-            repository, userService, mapper, realSpecification
-    );
+    private final EventService eventService = new EventService(repository, userService, mapper, realSpecification);
 
     private User organizer;
     private Event event;
@@ -61,14 +58,7 @@ class EventServiceTest {
         event.setEventStatus(EventStatus.DRAFT);
 
         createRequest = new EventCreateRequest(
-                "New Event",
-                "Description",
-                LocalDateTime.now().plusDays(10),
-                null,
-                50,
-                BigDecimal.TEN,
-                null
-        );
+                "New Event", "Description", LocalDateTime.now().plusDays(10), null, 50, BigDecimal.TEN, null);
 
         updateRequest = new EventUpdateRequest(
                 "Updated Title",
@@ -77,8 +67,7 @@ class EventServiceTest {
                 null,
                 100,
                 BigDecimal.valueOf(20),
-                EventStatus.PUBLISHED
-        );
+                EventStatus.PUBLISHED);
 
         responseLong = new EventResponseLong(
                 EXISTING_ID,
@@ -89,14 +78,10 @@ class EventServiceTest {
                 100,
                 BigDecimal.valueOf(20),
                 EventStatus.PUBLISHED,
-                null
-        );
+                null);
 
         responseShort = new EventResponseShort(
-                EXISTING_ID,
-                "Test Event",
-                LocalDateTime.now().plusDays(10)
-        );
+                EXISTING_ID, "Test Event", LocalDateTime.now().plusDays(10));
 
         pageable = PageRequest.of(0, 10, Sort.by("startDate").descending());
     }
@@ -135,8 +120,8 @@ class EventServiceTest {
     void getEventById_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        EventNotFoundException ex = assertThrows(EventNotFoundException.class,
-                () -> eventService.getEventById(NON_EXISTING_ID));
+        EventNotFoundException ex =
+                assertThrows(EventNotFoundException.class, () -> eventService.getEventById(NON_EXISTING_ID));
 
         assertEquals("Event с id " + NON_EXISTING_ID + " не найден", ex.getMessage());
     }
@@ -158,8 +143,8 @@ class EventServiceTest {
     void getEventByIdAsEntity_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        EventNotFoundException ex = assertThrows(EventNotFoundException.class,
-                () -> eventService.getEventByIdAsEntity(NON_EXISTING_ID));
+        EventNotFoundException ex =
+                assertThrows(EventNotFoundException.class, () -> eventService.getEventByIdAsEntity(NON_EXISTING_ID));
 
         assertEquals("Event с id " + NON_EXISTING_ID + " не найден", ex.getMessage());
     }
@@ -185,8 +170,7 @@ class EventServiceTest {
     void updateEvent_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        assertThrows(EventNotFoundException.class,
-                () -> eventService.updateEvent(NON_EXISTING_ID, updateRequest));
+        assertThrows(EventNotFoundException.class, () -> eventService.updateEvent(NON_EXISTING_ID, updateRequest));
     }
 
     // ====================== deleteEvent ======================
@@ -206,8 +190,7 @@ class EventServiceTest {
     void deleteEvent_notFound() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        assertThrows(EventNotFoundException.class,
-                () -> eventService.deleteEvent(NON_EXISTING_ID));
+        assertThrows(EventNotFoundException.class, () -> eventService.deleteEvent(NON_EXISTING_ID));
     }
 
     // ====================== getAllEvents ======================
@@ -215,15 +198,7 @@ class EventServiceTest {
     @Test
     @DisplayName("getAllEvents: возвращает страницу Short DTO с применённым фильтром")
     void getAllEvents_withFilter_appliesSpecification() {
-        EventFilter filter = new EventFilter(
-                "concert",
-                null,
-                null, null,
-                null, null,
-                null,
-                null, null,
-                true
-        );
+        EventFilter filter = new EventFilter("concert", null, null, null, null, null, null, null, null, true);
 
         List<Event> events = List.of(event);
         Page<Event> page = new PageImpl<>(events, pageable, events.size());
