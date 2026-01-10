@@ -54,6 +54,19 @@ test-job:
     when: always
     expire_in: 1 day
 
+code_quality:
+  stage: test
+  image: returntocorp/semgrep
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - semgrep --config=auto --json > gl-code-quality-report.json
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    expire_in: 1 day
+
+
 deploy:
   stage: deploy
   extends: .vps-job
