@@ -23,6 +23,14 @@ build-job:
       - target/*.jar
     expire_in: 1 day
 
+validation:
+  stage: test
+  extends: .vps-job
+  dependencies:
+    - build-job
+  script:
+    - mvn spotless:check
+
 test-job:
   stage: test
   extends: .vps-job
