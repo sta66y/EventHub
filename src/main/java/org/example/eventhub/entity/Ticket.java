@@ -38,7 +38,4 @@ public class Ticket {
     @Column(nullable = false)
     @Builder.Default
     private TicketStatus status = TicketStatus.RESERVED;
-
-    @Column(nullable = false)
-    private LocalDateTime reservedUntil;
 }

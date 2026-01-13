@@ -42,7 +42,10 @@ public class OrderService {
     public OrderResponseLong createOrder(OrderCreateRequest dto, Long userId) {
         User user = userService.getUserByIdAsEntity(userId);
 
-        Order order = Order.builder().user(user).build();
+        Order order = Order.builder()
+                .user(user)
+                .reservedUntil(LocalDateTime.now().plusMinutes(15))
+                .build();
 
         reserveTickets(order, dto.eventsId(), userId);
 
@@ -52,12 +55,16 @@ public class OrderService {
     @Scheduled(cron = "0 * * * * *")
     @Transactional
     public void cancelExpiredReservations() {
-        List<Ticket> expiredTickets =
-                ticketService.findExpiredReserved(LocalDateTime.now());
-
-        for (Ticket ticket : expiredTickets) {
-            ticket.setStatus(TicketStatus.CANCELLED);
-            ticket.getEvent().decrementReservedCount();
+        List<Order> expiredOrders =
+                repository.findOrdersByStatusAndReservedUntilBefore(OrderStatus.PENDING, LocalDateTime.now());
+        for (Order order : expiredOrders) {
+            order.setStatus(OrderStatus.CANCELLED);
+            order.getTickets().forEach(t -> {
+                if (t.getStatus() == TicketStatus.RESERVED) {
+                    t.getEvent().decrementReservedCount();
+                    t.setStatus(TicketStatus.CANCELLED);
+                }
+            });
         }
     }
 

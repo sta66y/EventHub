@@ -41,12 +41,7 @@ class TicketService {
                     .event(event)
                     .user(user)
                     .price(event.getPrice())
-                    .reservedUntil(LocalDateTime.now().plusMinutes(15)) //TODO вынести
                     .build()
         );
-    }
-
-    List<Ticket> findExpiredReserved(LocalDateTime now) {
-        return repository.findTicketsByStatusAndReservedUntilBefore(TicketStatus.RESERVED, now);
     }
 }

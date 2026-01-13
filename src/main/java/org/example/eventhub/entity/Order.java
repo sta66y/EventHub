@@ -42,4 +42,7 @@ public class Order {
     @Column(nullable = false)
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
+
+    @Column(nullable = false)
+    private LocalDateTime reservedUntil;
 }
