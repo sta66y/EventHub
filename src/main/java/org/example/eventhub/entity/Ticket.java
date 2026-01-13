@@ -35,5 +35,5 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private TicketStatus status = TicketStatus.PAID;
+    private TicketStatus status = TicketStatus.RESERVED;
 }

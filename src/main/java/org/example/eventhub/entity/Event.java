@@ -49,4 +49,10 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
+
+    @Version
+    private Long version;
+
+    @Column(nullable = false)
+    private int reservedCount;
 }

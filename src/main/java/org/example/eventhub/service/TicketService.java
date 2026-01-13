@@ -5,6 +5,7 @@ import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
+import org.example.eventhub.enums.TicketStatus;
 import org.example.eventhub.exception.NoAvailableTicketsException;
 import org.example.eventhub.repository.TicketRepository;
 import org.springframework.stereotype.Service;
@@ -21,19 +22,21 @@ public class TicketService {
         User user = userService.getUserByIdAsEntity(userId);
         Event event = eventService.getEventByIdAsEntity(eventId);
 
-        checkIfThereAnyAvailableTickets(event);
+        if (event.getReservedCount() >= event.getCapacity()) {
+            throw new NoAvailableTicketsException("Свободных билетов для " + event.getTitle() + " не осталось");
+        }
 
-        return Ticket.builder()
-                .order(order)
-                .event(event)
-                .user(user)
-                .price(event.getPrice())
-                .build();
-    }
+        event.setReservedCount(event.getReservedCount() + 1);
+        eventService.saveEvent(event);
 
-    private void checkIfThereAnyAvailableTickets(Event event) {
-        if (event.getCapacity() <= repository.countActiveByEvent(event))
-            throw new NoAvailableTicketsException(
-                    "Все билеты на мероприятие с id " + event.getId() + " уже распроданы");
+
+        return repository.save(
+                Ticket.builder()
+                    .order(order)
+                    .event(event)
+                    .user(user)
+                    .price(event.getPrice())
+                    .build()
+        );
     }
 }

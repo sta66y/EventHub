@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.order.OrderCreateRequest;
 import org.example.eventhub.dto.order.OrderResponseLong;
 import org.example.eventhub.dto.order.OrderResponseShort;
+import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
@@ -31,24 +32,29 @@ public class OrderService {
 
     private final OrderRepository repository;
 
+    @Transactional
     public OrderResponseLong createOrder(OrderCreateRequest dto, Long userId) {
         User user = userService.getUserByIdAsEntity(userId);
 
         Order order = Order.builder().user(user).build();
 
+        reserveTickets(order, dto.eventsId(), userId);
+
+        return mapper.toLongDto(repository.save(order));
+    }
+
+    private void reserveTickets(Order order, List<Long> eventIds, Long userId) {
         List<Ticket> tickets = new ArrayList<>();
 
         BigDecimal totalPrice = BigDecimal.ZERO;
-        for (int i = 0; i < dto.eventsId().size(); i++) {
-            Ticket ticket = ticketService.createTicket(dto.eventsId().get(i), userId, order);
+        for (int i = 0; i < eventIds.size(); i++) {
+            Ticket ticket = ticketService.createTicket(eventIds.get(i), userId, order);
             tickets.add(ticket);
             totalPrice = totalPrice.add(ticket.getPrice());
         }
 
         order.setTotalPrice(totalPrice);
         order.setTickets(tickets);
-
-        return mapper.toLongDto(repository.save(order));
     }
 
     public OrderResponseLong getOrderById(Long id) {

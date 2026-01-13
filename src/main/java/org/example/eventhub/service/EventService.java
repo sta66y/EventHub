@@ -57,4 +57,8 @@ public class EventService {
     public Event getEventByIdAsEntity(Long id) {
         return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
     }
+
+    void saveEvent(Event event) {
+        repository.save(event);
+    }
 }
