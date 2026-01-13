@@ -2,6 +2,8 @@ package org.example.eventhub.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import lombok.*;
 import org.example.eventhub.enums.TicketStatus;
 
@@ -36,4 +38,7 @@ public class Ticket {
     @Column(nullable = false)
     @Builder.Default
     private TicketStatus status = TicketStatus.RESERVED;
+
+    @Column(nullable = false)
+    private LocalDateTime reservedUntil;
 }

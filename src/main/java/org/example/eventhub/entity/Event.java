@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 import org.example.eventhub.enums.EventStatus;
+import org.example.eventhub.exception.NoAvailableTicketsException;
 
 @Entity
 @NoArgsConstructor
@@ -55,4 +56,21 @@ public class Event {
 
     @Column(nullable = false)
     private int reservedCount;
+
+    public void decrementReservedCount() {
+        if (reservedCount <= 0) {
+            throw new IllegalStateException("reservedCount < 0");
+        }
+
+        this.reservedCount--;
+    }
+
+    public void incrementReservedCount() {
+        if (reservedCount >= capacity) {
+            throw new NoAvailableTicketsException("Свободных билетов для " + this.getTitle() + " не осталось");
+        }
+
+        reservedCount++;
+    }
+
 }

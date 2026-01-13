@@ -1,8 +1,12 @@
 package org.example.eventhub.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.example.eventhub.dto.order.OrderCreateRequest;
 import org.example.eventhub.dto.order.OrderResponseLong;
@@ -12,11 +16,13 @@ import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.OrderStatus;
+import org.example.eventhub.enums.TicketStatus;
 import org.example.eventhub.exception.OrderNotFoundException;
 import org.example.eventhub.mapper.OrderMapper;
 import org.example.eventhub.repository.OrderRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +49,42 @@ public class OrderService {
         return mapper.toLongDto(repository.save(order));
     }
 
+    @Scheduled(cron = "0 * * * * *")
+    @Transactional
+    public void cancelExpiredReservations() {
+        List<Ticket> expiredTickets =
+                ticketService.findExpiredReserved(LocalDateTime.now());
+
+        for (Ticket ticket : expiredTickets) {
+            ticket.setStatus(TicketStatus.CANCELLED);
+            ticket.getEvent().decrementReservedCount();
+        }
+    }
+
+    @Transactional
+    public void payOrder(Long orderId) {
+        Order order = getOrderByIdAsEntity(orderId);
+
+        if (order.getStatus() != OrderStatus.PENDING)
+            throw new IllegalStateException("Нельзя оплатить заказ в статусе " + order.getStatus());
+
+        order.setStatus(OrderStatus.PAID);
+        order.getTickets().forEach(t -> t.setStatus(TicketStatus.PAID));
+    }
+
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = getOrderByIdAsEntity(orderId);
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.getTickets().forEach(t -> {
+            if (t.getStatus() != TicketStatus.CANCELLED) {
+                t.setStatus(TicketStatus.CANCELLED);
+                t.getEvent().decrementReservedCount();
+            }
+        });
+    }
+
     private void reserveTickets(Order order, List<Long> eventIds, Long userId) {
         List<Ticket> tickets = new ArrayList<>();
 
@@ -65,14 +107,6 @@ public class OrderService {
 
     public Page<OrderResponseShort> getAllOrders(Long userId, Pageable pageable) {
         return repository.findAllByUserId(userId, pageable).map(mapper::toShortDto);
-    }
-
-    public OrderResponseLong cancelOrder(Long id) {
-        Order order = getOrderByIdAsEntity(id);
-
-        order.setStatus(OrderStatus.CANCELLED);
-
-        return mapper.toLongDto(repository.save(order));
     }
 
     private Order getOrderByIdAsEntity(Long id) {

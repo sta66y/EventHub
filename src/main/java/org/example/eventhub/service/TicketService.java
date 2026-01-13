@@ -1,5 +1,6 @@
 package org.example.eventhub.service;
 
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
@@ -10,24 +11,28 @@ import org.example.eventhub.exception.NoAvailableTicketsException;
 import org.example.eventhub.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class TicketService {
+class TicketService {
 
     private final TicketRepository repository;
     private final UserService userService;
     private final EventService eventService;
 
-    public Ticket createTicket(Long eventId, Long userId, Order order) {
+    Ticket createTicket(Long eventId, Long userId, Order order) {
         User user = userService.getUserByIdAsEntity(userId);
         Event event = eventService.getEventByIdAsEntity(eventId);
 
-        if (event.getReservedCount() >= event.getCapacity()) {
-            throw new NoAvailableTicketsException("Свободных билетов для " + event.getTitle() + " не осталось");
-        }
+        event.incrementReservedCount();
 
-        event.setReservedCount(event.getReservedCount() + 1);
-        eventService.saveEvent(event);
+        try {
+            eventService.saveEvent(event);
+        } catch (OptimisticLockException e) {
+            throw new NoAvailableTicketsException("Билеты только что закончились");
+        }
 
 
         return repository.save(
@@ -36,7 +41,12 @@ public class TicketService {
                     .event(event)
                     .user(user)
                     .price(event.getPrice())
+                    .reservedUntil(LocalDateTime.now().plusMinutes(15)) //TODO вынести
                     .build()
         );
+    }
+
+    List<Ticket> findExpiredReserved(LocalDateTime now) {
+        return repository.findTicketsByStatusAndReservedUntilBefore(TicketStatus.RESERVED, now);
     }
 }

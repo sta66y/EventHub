@@ -38,8 +38,15 @@ public class OrderController {
 
     @PostMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponseLong cancelOrder(
-            @PathVariable Long id) { // TODO короч надо придумать как точечно возвращать билеты
-        return service.cancelOrder(id);
+    public void cancelOrder(
+            @PathVariable Long id) {
+        service.cancelOrder(id);
+    }
+
+    @PostMapping("/{id}/pay")
+    @ResponseStatus(HttpStatus.OK)
+    public void payOrder(
+            @PathVariable Long id) {
+        service.payOrder(id);
     }
 }
