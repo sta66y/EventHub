@@ -15,9 +15,11 @@ import org.example.eventhub.dto.order.OrderResponseLong;
 import org.example.eventhub.dto.order.OrderResponseShort;
 import org.example.eventhub.dto.ticket.TicketResponseShort;
 import org.example.eventhub.dto.user.UserResponseShort;
+import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
+import org.example.eventhub.enums.EventStatus;
 import org.example.eventhub.enums.OrderStatus;
 import org.example.eventhub.enums.TicketStatus;
 import org.example.eventhub.exception.OrderNotFoundException;
@@ -63,11 +65,17 @@ class OrderServiceTest {
         user = new User();
         user.setId(USER_ID);
 
-        ticket1 = new Ticket();
-        ticket1.setPrice(BigDecimal.valueOf(1000));
+        Event event = new Event();
 
-        ticket2 = new Ticket();
-        ticket2.setPrice(BigDecimal.valueOf(2500));
+        ticket1 = Ticket.builder()
+                .price(BigDecimal.valueOf(1000))
+                .event(event)
+                .build();
+
+        ticket2 = Ticket.builder()
+                .price(BigDecimal.valueOf(2500))
+                .event(event)
+                .build();
 
         order = Order.builder()
                 .id(EXISTING_ORDER_ID)
@@ -186,36 +194,49 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("cancelOrder: успешно отменяет заказ и возвращает обновлённый Long DTO")
-    void cancelOrder_success() {
+    @DisplayName("cancelOrder: бросает исключение, если нечего отменять")
+    void cancelOrder_fail() {
         when(repository.findById(EXISTING_ORDER_ID)).thenReturn(Optional.of(order));
 
+        assertThrows(IllegalStateException.class, () -> orderService.cancelOrder(EXISTING_ORDER_ID));
+    }
+
+    @Test
+    @DisplayName("cancelOrder: бросает исключение, если статус event не Pending")
+    void cancelOrder_otherStatus() {
         Order cancelledOrder = Order.builder()
-                .id(EXISTING_ORDER_ID)
-                .user(user)
                 .status(OrderStatus.CANCELLED)
-                .totalPrice(BigDecimal.valueOf(3500))
-                .tickets(List.of(ticket1, ticket2))
+                .build();
+        when(repository.findById(EXISTING_ORDER_ID)).thenReturn(Optional.of(cancelledOrder));
+
+        assertThrows(IllegalStateException.class, () -> orderService.cancelOrder(EXISTING_ORDER_ID));
+    }
+
+    @Test
+    @DisplayName("cancelOrder: успешно отменяет заказ и билеты")
+    void cancelOrder_success() {
+        Event event = new Event();
+        event.setReservedCount(2);
+
+        Ticket ticket = Ticket.builder()
+                .status(TicketStatus.RESERVED)
+                .event(event)
                 .build();
 
-        when(repository.save(order)).thenReturn(cancelledOrder);
+        Order order = Order.builder()
+                .status(OrderStatus.PENDING)
+                .tickets(List.of(ticket))
+                .build();
 
-        OrderResponseLong cancelledResponse = new OrderResponseLong(
-                EXISTING_ORDER_ID,
-                userShort,
-                List.of(ticketShort1, ticketShort2),
-                BigDecimal.valueOf(3500),
-                OrderStatus.CANCELLED);
+        when(repository.findById(EXISTING_ORDER_ID)).thenReturn(Optional.of(order));
 
-        when(mapper.toLongDto(cancelledOrder)).thenReturn(cancelledResponse);
-
-        OrderResponseLong result = orderService.cancelOrder(EXISTING_ORDER_ID);
+        orderService.cancelOrder(EXISTING_ORDER_ID);
 
         assertEquals(OrderStatus.CANCELLED, order.getStatus());
-        assertEquals(cancelledResponse, result);
-        assertEquals(OrderStatus.CANCELLED, result.orderStatus());
-        verify(repository).save(order);
+        assertEquals(TicketStatus.CANCELLED, ticket.getStatus());
+        assertEquals(1, event.getReservedCount());
     }
+
 
     @Test
     @DisplayName("cancelOrder: бросает исключение, если заказ не найден")
@@ -224,4 +245,71 @@ class OrderServiceTest {
 
         assertThrows(OrderNotFoundException.class, () -> orderService.cancelOrder(NON_EXISTING_ORDER_ID));
     }
+
+    @Test
+    @DisplayName("cancelExpiredReservations: отменяет просроченные заказы и билеты")
+    void cancelExpiredReservations_success() {
+        Event event = new Event();
+        event.setReservedCount(2);
+
+        Ticket reservedTicket = Ticket.builder()
+                .status(TicketStatus.RESERVED)
+                .event(event)
+                .build();
+
+        Order expiredOrder = Order.builder()
+                .status(OrderStatus.PENDING)
+                .reservedUntil(LocalDateTime.now().minusMinutes(1))
+                .tickets(List.of(reservedTicket))
+                .build();
+
+        when(repository.findOrdersByStatusAndReservedUntilBefore(
+                eq(OrderStatus.PENDING), any(LocalDateTime.class)))
+                .thenReturn(List.of(expiredOrder));
+
+        orderService.cancelExpiredReservations();
+
+        assertEquals(OrderStatus.CANCELLED, expiredOrder.getStatus());
+        assertEquals(TicketStatus.CANCELLED, reservedTicket.getStatus());
+        assertEquals(1, event.getReservedCount());
+    }
+
+    @Test
+    @DisplayName("payOrder: успешно переводит заказ и билеты в PAID")
+    void payOrder_success() {
+        Ticket ticket = Ticket.builder()
+                .status(TicketStatus.RESERVED)
+                .build();
+
+        Order order = Order.builder()
+                .id(EXISTING_ORDER_ID)
+                .status(OrderStatus.PENDING)
+                .tickets(List.of(ticket))
+                .build();
+
+        when(repository.findById(EXISTING_ORDER_ID)).thenReturn(Optional.of(order));
+
+        orderService.payOrder(EXISTING_ORDER_ID);
+
+        assertEquals(OrderStatus.PAID, order.getStatus());
+        assertEquals(TicketStatus.PAID, ticket.getStatus());
+    }
+
+    @Test
+    @DisplayName("payOrder: бросает исключение, если статус не PENDING")
+    void payOrder_wrongStatus() {
+        Order order = Order.builder()
+                .status(OrderStatus.CANCELLED)
+                .build();
+
+        when(repository.findById(EXISTING_ORDER_ID)).thenReturn(Optional.of(order));
+
+        IllegalStateException ex =
+                assertThrows(IllegalStateException.class,
+                        () -> orderService.payOrder(EXISTING_ORDER_ID));
+
+        assertTrue(ex.getMessage().contains("Нельзя оплатить заказ"));
+    }
+
+
 }

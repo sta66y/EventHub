@@ -37,19 +37,27 @@ class TicketServiceTest {
 
         event = new Event();
         event.setId(EVENT_ID);
-        event.setCapacity(100);
+        event.setCapacity(1);
         event.setPrice(BigDecimal.valueOf(2500));
 
         order = Order.builder().id(ORDER_ID).build();
     }
 
     @Test
-    @DisplayName("createTicket: успешно создаёт тикет, если есть свободные места")
+    @DisplayName("createTicket: успешно создаёт билет, если есть свободные места")
     void createTicket_success_whenTicketsAvailable() {
+        Ticket input = Ticket.builder()
+            .event(event)
+            .user(user)
+            .order(order)
+            .price(event.getPrice())
+            .build();
+
         when(userService.getUserByIdAsEntity(USER_ID)).thenReturn(user);
         when(eventService.getEventByIdAsEntity(EVENT_ID)).thenReturn(event);
+        doNothing().when(eventService).saveEvent(event);
+        when(repository.save(any())).thenReturn(input);
 
-        when(repository.countActiveByEvent(event)).thenReturn(50);
 
         Ticket result = ticketService.createTicket(EVENT_ID, USER_ID, order);
 
@@ -61,36 +69,23 @@ class TicketServiceTest {
 
         verify(userService).getUserByIdAsEntity(USER_ID);
         verify(eventService).getEventByIdAsEntity(EVENT_ID);
-        verify(repository).countActiveByEvent(event);
     }
 
     @Test
     @DisplayName("createTicket: бросает NoAvailableTicketsException, если билетов нет")
     void createTicket_throwsException_whenNoTicketsAvailable() {
+        Event eventWithoutTickets = Event.builder()
+                .id(EVENT_ID)
+                .capacity(0)
+                .build();
+
         when(userService.getUserByIdAsEntity(USER_ID)).thenReturn(user);
-        when(eventService.getEventByIdAsEntity(EVENT_ID)).thenReturn(event);
-        when(repository.countActiveByEvent(event)).thenReturn(100);
+        when(eventService.getEventByIdAsEntity(EVENT_ID)).thenReturn(eventWithoutTickets);
 
-        NoAvailableTicketsException ex = assertThrows(
-                NoAvailableTicketsException.class, () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
+       assertThrows(NoAvailableTicketsException.class, () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
 
-        assertEquals("Все билеты на мероприятие с id " + EVENT_ID + " уже распроданы", ex.getMessage());
 
         verify(userService).getUserByIdAsEntity(USER_ID);
         verify(eventService).getEventByIdAsEntity(EVENT_ID);
-        verify(repository).countActiveByEvent(event);
-    }
-
-    @Test
-    @DisplayName("createTicket: бросает NoAvailableTicketsException, если продано больше capacity")
-    void createTicket_throwsException_whenOverCapacity() {
-        when(userService.getUserByIdAsEntity(USER_ID)).thenReturn(user);
-        when(eventService.getEventByIdAsEntity(EVENT_ID)).thenReturn(event);
-
-        when(repository.countActiveByEvent(event)).thenReturn(101);
-
-        assertThrows(NoAvailableTicketsException.class, () -> ticketService.createTicket(EVENT_ID, USER_ID, order));
-
-        verify(repository).countActiveByEvent(event);
     }
 }

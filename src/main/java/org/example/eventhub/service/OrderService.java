@@ -83,6 +83,9 @@ public class OrderService {
     public void cancelOrder(Long orderId) {
         Order order = getOrderByIdAsEntity(orderId);
 
+        if (order.getStatus() != OrderStatus.PENDING)
+            throw new IllegalStateException("Нельзя отменять заказ со статусом " + order.getStatus());
+
         order.setStatus(OrderStatus.CANCELLED);
         order.getTickets().forEach(t -> {
             if (t.getStatus() != TicketStatus.CANCELLED) {

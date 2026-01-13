@@ -36,6 +36,7 @@ public class Order {
 
     @CreationTimestamp
     @Column(nullable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)

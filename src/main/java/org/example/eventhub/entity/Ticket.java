@@ -31,8 +31,7 @@ public class Ticket {
     private Order order;
 
     @Column(nullable = false)
-    @Builder.Default
-    private BigDecimal price = BigDecimal.ZERO;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

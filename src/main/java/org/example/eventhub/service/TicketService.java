@@ -31,7 +31,7 @@ class TicketService {
         try {
             eventService.saveEvent(event);
         } catch (OptimisticLockException e) {
-            throw new NoAvailableTicketsException("Билеты только что закончились");
+            throw new NoAvailableTicketsException("Все билеты на мероприятие с id " + eventId + " уже распроданы");
         }
 
 

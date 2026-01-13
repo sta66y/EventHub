@@ -55,7 +55,8 @@ public class Event {
     private Long version;
 
     @Column(nullable = false)
-    private int reservedCount;
+    @Builder.Default
+    private int reservedCount = 0;
 
     public void decrementReservedCount() {
         if (reservedCount <= 0) {
