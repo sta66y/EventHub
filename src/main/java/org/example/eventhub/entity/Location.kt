@@ -1,31 +1,18 @@
-package org.example.eventhub.entity;
+package org.example.eventhub.entity
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 
 @Embeddable
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Location {
-
+class Location(
     @Column(length = 100)
-    @NotBlank
-    private String city;
+    var city: String? = null,
 
     @Column(length = 200)
-    @NotBlank
-    private String street;
+    var street: String? = null,
 
     @Column(length = 20)
-    @NotBlank
-    private String house;
+    var house: String? = null,
 
-    private String additionalInfo;
-}
+    var additionalInfo: String? = null
+)

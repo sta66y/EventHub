@@ -1,40 +1,42 @@
-package org.example.eventhub.entity;
+package org.example.eventhub.entity
 
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import lombok.*;
-import org.example.eventhub.enums.TicketStatus;
+import jakarta.persistence.*
+import org.example.eventhub.enums.TicketStatus
+import java.math.BigDecimal
 
 @Entity
-@NoArgsConstructor
-@Getter
-@Setter
-@AllArgsConstructor
-@Builder
-public class Ticket {
+@Table(name = "tickets")
+class Ticket(
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    var id: Long? = null,
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "event_id")
-    private Event event;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_id", nullable = false)
+    var event: Event,
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    var user: User,
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
+    var order: Order,
 
     @Column(nullable = false)
-    private BigDecimal price;
+    var price: BigDecimal,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private TicketStatus status = TicketStatus.RESERVED;
+    var status: TicketStatus = TicketStatus.RESERVED
+) {
+
+    fun pay() {
+        status = TicketStatus.PAID
+    }
+
+    fun cancel() {
+        status = TicketStatus.CANCELLED
+    }
 }

@@ -1,45 +1,50 @@
-package org.example.eventhub.entity;
+package org.example.eventhub.entity
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.*;
-import org.example.eventhub.enums.Role;
-import org.hibernate.annotations.CreationTimestamp;
+import jakarta.persistence.*
+import org.example.eventhub.enums.Role
+import org.hibernate.annotations.CreationTimestamp
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
-public class User {
+class User(
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    var id: Long? = null,
 
     @Column(nullable = false, unique = true, length = 50)
-    private String username;
+    var username: String,
 
     @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    var email: String,
 
     @Column(nullable = false)
-    private String password; // TODO шифровать
+    var password: String,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private Role role = Role.USER;
+    var role: Role = Role.USER,
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    var createdAt: LocalDateTime? = null,
 
-    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = false)
-    @Builder.Default
-    private List<Event> organizedEvents = new ArrayList<>();
+    @OneToMany(
+        mappedBy = "organizer",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = false,
+        fetch = FetchType.LAZY
+    )
+    var organizedEvents: MutableList<Event> = mutableListOf()
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is User) return false
+        if (id == null || other.id == null) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id?.hashCode() ?: 0
 }
