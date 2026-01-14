@@ -120,7 +120,7 @@ class EventMapperTest {
     @Test
     @DisplayName("toEntity: маппит CreateRequest в новую сущность Event с вложенной Location")
     void toEntity_shouldMapCreateRequestCorrectly() {
-        LocationCreateRequest locDto = createRequest.location();
+        LocationCreateRequest locDto = createRequest.location;
         Location newLocation = Location.builder()
                 .city("SPb")
                 .street("Nevsky")

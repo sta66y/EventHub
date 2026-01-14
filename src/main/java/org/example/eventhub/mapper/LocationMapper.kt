@@ -1,19 +1,24 @@
-package org.example.eventhub.mapper;
+package org.example.eventhub.mapper
 
-import org.example.eventhub.dto.location.LocationCreateRequest;
-import org.example.eventhub.dto.location.LocationResponseLong;
-import org.example.eventhub.entity.Location;
-import org.springframework.stereotype.Component;
+import org.example.eventhub.dto.location.LocationCreateRequest
+import org.example.eventhub.dto.location.LocationResponseLong
+import org.example.eventhub.dto.location.LocationUpdateRequest
+import org.example.eventhub.entity.Location
+import org.springframework.stereotype.Component
 
 @Component
-public class LocationMapper {
-
-    public Location toEntity(LocationCreateRequest dto) {
-        return new Location(dto.city(), dto.street(), dto.house(), dto.additionalInfo());
+class LocationMapper {
+    fun toEntity(dto: LocationCreateRequest): Location {
+        return Location(dto.city, dto.street, dto.house, dto.additionalInfo)
     }
 
-    public LocationResponseLong toLongDto(Location entity) {
-        return new LocationResponseLong(
-                entity.getCity(), entity.getStreet(), entity.getHouse(), entity.getAdditionalInfo());
+    fun toEntity(dto: LocationUpdateRequest): Location {
+        return Location(dto.city, dto.street, dto.house, dto.additionalInfo)
+    }
+
+    fun toLongDto(entity: Location?): LocationResponseLong {
+        return LocationResponseLong(
+            entity?.city, entity?.street, entity?.house, entity?.additionalInfo
+        )
     }
 }

@@ -1,35 +1,39 @@
-package org.example.eventhub.mapper;
+package org.example.eventhub.mapper
 
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.user.UserCreateRequest;
-import org.example.eventhub.dto.user.UserResponseLong;
-import org.example.eventhub.dto.user.UserResponseShort;
-import org.example.eventhub.entity.User;
-import org.springframework.stereotype.Component;
+import org.example.eventhub.dto.user.UserCreateRequest
+import org.example.eventhub.dto.user.UserResponseLong
+import org.example.eventhub.dto.user.UserResponseShort
+import org.example.eventhub.entity.User
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Component
 
 @Component
-@RequiredArgsConstructor
-public class UserMapper {
-
-    public UserResponseShort toShortDto(User entity) {
-        return new UserResponseShort(entity.getUsername());
+class UserMapper(
+    private val passwordEncoder: PasswordEncoder
+) {
+    fun toShortDto(entity: User): UserResponseShort {
+        return UserResponseShort(entity.username)
     }
 
-    public UserResponseLong toLongDto(User entity) {
-        return new UserResponseLong(
-                entity.getId(),
-                entity.getUsername(),
-                entity.getEmail(),
-                entity.getRole(),
-                entity.getCreatedAt(),
-                entity.getOrganizedEvents().size());
+    fun toLongDto(entity: User): UserResponseLong {
+        return UserResponseLong(
+            id = entity.id,
+            username = entity.username,
+            email = entity.email,
+            role = entity.role,
+            createdAt =  entity.createdAt,
+            countOrganizedEvents =  entity.organizedEvents.size.toLong()
+        )
     }
 
-    public User toEntity(UserCreateRequest dto) {
-        return User.builder()
-                .username(dto.username())
-                .email(dto.email())
-                .password(dto.password())
-                .build();
+    fun toEntity(dto: UserCreateRequest): User {
+        return User(
+            username = dto.username,
+            email = dto.email,
+            password = requireNotNull(passwordEncoder.encode(dto.password)) {
+                "PasswordEncoder returned null"
+            }
+        )
     }
+
 }

@@ -1,30 +1,31 @@
-package org.example.eventhub.mapper;
+package org.example.eventhub.mapper
 
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.ticket.TicketResponseLong;
-import org.example.eventhub.dto.ticket.TicketResponseShort;
-import org.example.eventhub.entity.Ticket;
-import org.springframework.stereotype.Component;
+import org.example.eventhub.dto.ticket.TicketResponseLong
+import org.example.eventhub.dto.ticket.TicketResponseShort
+import org.example.eventhub.entity.Ticket
+import org.springframework.stereotype.Component
 
 @Component
-@RequiredArgsConstructor
-public class TicketMapper {
-
-    private final EventMapper eventMapper;
-    private final UserMapper userMapper;
-
-    public TicketResponseLong toLongDto(Ticket entity) {
-        return new TicketResponseLong(
-                entity.getId(),
-                eventMapper.toShortDto(entity.getEvent()),
-                userMapper.toShortDto(entity.getUser()),
-                entity.getOrder().getId(),
-                entity.getPrice(),
-                entity.getStatus());
+class TicketMapper (
+    private val eventMapper: EventMapper,
+    private val userMapper: UserMapper
+){
+    fun toLongDto(entity: Ticket): TicketResponseLong {
+        return TicketResponseLong(
+            id = entity.id,
+            event = eventMapper.toShortDto(entity.event),
+            user = userMapper.toShortDto(entity.user),
+            orderId = entity.order.id,
+            price = entity.price,
+            ticketStatus = entity.status
+        )
     }
 
-    public TicketResponseShort toShortDto(Ticket entity) {
-        return new TicketResponseShort(
-                eventMapper.toShortDto(entity.getEvent()), userMapper.toShortDto(entity.getUser()), entity.getStatus());
+    fun toShortDto(entity: Ticket): TicketResponseShort {
+        return TicketResponseShort(
+            event = eventMapper.toShortDto(entity.event),
+            user = userMapper.toShortDto(entity.user),
+            ticketStatus = entity.status
+        )
     }
 }
