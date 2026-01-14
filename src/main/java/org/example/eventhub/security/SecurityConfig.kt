@@ -10,10 +10,10 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-open class SecurityConfig {
+class SecurityConfig {
 
     @Bean
-    open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests { it.anyRequest().authenticated() }
@@ -23,7 +23,7 @@ open class SecurityConfig {
     }
 
     @Bean
-    open fun passwordEncoder(): PasswordEncoder =
+    fun passwordEncoder(): PasswordEncoder =
         BCryptPasswordEncoder()
 
 }
