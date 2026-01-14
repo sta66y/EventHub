@@ -1,64 +1,61 @@
-package org.example.eventhub.service;
+package org.example.eventhub.service
 
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.event.*;
-import org.example.eventhub.entity.Event;
-import org.example.eventhub.entity.User;
-import org.example.eventhub.exception.EventNotFoundException;
-import org.example.eventhub.mapper.EventMapper;
-import org.example.eventhub.repository.EventRepository;
-import org.example.eventhub.specification.EventSpecification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.example.eventhub.dto.event.*
+import org.example.eventhub.entity.Event
+import org.example.eventhub.exception.EventNotFoundException
+import org.example.eventhub.mapper.EventMapper
+import org.example.eventhub.repository.EventRepository
+import org.example.eventhub.specification.EventSpecification
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-public class EventService {
+class EventService(
+    private val repository: EventRepository,
+    private val userService: UserService,
+    private val mapper: EventMapper,
+    private val specification: EventSpecification
+) {
 
-    private final EventRepository repository;
-    private final UserService userService;
-    private final EventMapper mapper;
-    private final EventSpecification specification;
-
-    public EventResponseLong createEvent(EventCreateRequest dto, Long organizerId) {
-        User user = userService.getUserByIdAsEntity(organizerId);
-        Event event = mapper.toEntity(dto, user);
-
-        return mapper.toLongDto(repository.save(event));
+    fun createEvent(
+        dto: EventCreateRequest,
+        organizerId: Long
+    ): EventResponseLong {
+        val user = userService.getUserByIdAsEntity(organizerId)
+        val event = mapper.toEntity(dto, user)
+        return mapper.toLongDto(repository.save(event))
     }
 
-    public EventResponseLong getEventById(Long id) {
-        return mapper.toLongDto(getEventByIdAsEntity(id));
+    fun getEventById(id: Long): EventResponseLong =
+        mapper.toLongDto(getEventByIdAsEntity(id))
+
+    fun getAllEvents(
+        pageable: Pageable,
+        eventFilter: EventFilter
+    ): Page<EventResponseShort> =
+        repository.findAll(specification.withFilter(eventFilter), pageable)
+            .map(mapper::toShortDto)
+
+    fun updateEvent(
+        id: Long,
+        dto: EventUpdateRequest
+    ): EventResponseLong {
+        val event = getEventByIdAsEntity(id)
+        mapper.updateEntity(dto, event)
+        return mapper.toLongDto(event)
     }
 
-    public Page<EventResponseShort> getAllEvents(Pageable pageable, EventFilter eventFilter) {
-        return repository
-                .findAll(specification.withFilter(eventFilter), pageable)
-                .map(mapper::toShortDto);
+    fun deleteEvent(id: Long) {
+        getEventByIdAsEntity(id)
+        repository.deleteById(id)
     }
 
-    public EventResponseLong updateEvent(Long id, EventUpdateRequest dto) {
-        Event event = getEventByIdAsEntity(id);
+    fun getEventByIdAsEntity(id: Long): Event =
+        repository.findById(id)
+            .orElseThrow { EventNotFoundException("Event с id $id не найден") }
 
-        mapper.updateEntity(dto, event);
-
-        return mapper.toLongDto(repository.save(event));
-    }
-
-    public void deleteEvent(Long id) {
-        getEventByIdAsEntity(id);
-
-        repository.deleteById(id);
-    }
-
-    public Event getEventByIdAsEntity(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EventNotFoundException("Event с id " + id + " не найден"));
-    }
-
-    void saveEvent(Event event) {
-        repository.save(event);
-    }
+    fun saveEvent(event: Event) = repository.save(event)
 }
