@@ -1,5 +1,5 @@
-package org.example.eventhub.dto.ticket;
+package org.example.eventhub.dto.ticket
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull
 
-public record TicketCreateRequest(@NotNull(message = "eventId обязателен") Long eventId) {}
+data class TicketCreateRequest(val eventId: @NotNull(message = "eventId обязателен") Long)

@@ -1,13 +1,13 @@
-package org.example.eventhub.dto.user;
+package org.example.eventhub.dto.user
 
-import java.time.LocalDateTime;
-import org.example.eventhub.enums.Role;
+import org.example.eventhub.enums.Role
+import java.time.LocalDateTime
 
-public record UserFilter(
-        String username,
-        Role role,
-        LocalDateTime fromCreatedAt,
-        LocalDateTime toCreatedAt,
-        Integer minOrganizedEvents,
-        Integer maxOrganizedEvents // TODO сортировку мб?
-        ) {}
+data class UserFilter(
+    val username: String?,
+    val role: Role?,
+    val fromCreatedAt: LocalDateTime?,
+    val toCreatedAt: LocalDateTime?,
+    val minOrganizedEvents: Int?,
+    val maxOrganizedEvents: Int? // TODO сортировку мб?
+)

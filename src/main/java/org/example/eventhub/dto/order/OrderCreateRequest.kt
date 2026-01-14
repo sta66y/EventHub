@@ -1,7 +1,5 @@
-package org.example.eventhub.dto.order;
+package org.example.eventhub.dto.order
 
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import jakarta.validation.constraints.NotNull
 
-public record OrderCreateRequest(
-        @NotNull(message = "Хотя бы одно мероприятие должно быть в заказе") List<Long> eventsId) {}
+data class OrderCreateRequest(val eventsId: @NotNull(message = "Хотя бы одно мероприятие должно быть в заказе") MutableList<Long>)

@@ -1,3 +1,3 @@
-package org.example.eventhub.dto.location;
+package org.example.eventhub.dto.location
 
-public record LocationResponseLong(String city, String street, String house, String additionalInfo) {}
+data class LocationResponseLong(val city: String?, val street: String?, val house: String?, val additionalInfo: String?)

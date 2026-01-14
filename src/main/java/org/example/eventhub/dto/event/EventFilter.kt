@@ -1,17 +1,18 @@
-package org.example.eventhub.dto.event;
+package org.example.eventhub.dto.event
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import org.example.eventhub.enums.EventStatus;
+import org.example.eventhub.enums.EventStatus
+import java.math.BigDecimal
+import java.time.LocalDateTime
 
-public record EventFilter(
-        String title,
-        String city,
-        Integer minCapacity,
-        Integer maxCapacity,
-        BigDecimal minPrice,
-        BigDecimal maxPrice,
-        EventStatus eventStatus,
-        LocalDateTime fromDateTime,
-        LocalDateTime toDateTime,
-        Boolean upcoming) {}
+data class EventFilter(
+    val title: String?,
+    val city: String?,
+    val minCapacity: Int?,
+    val maxCapacity: Int?,
+    val minPrice: BigDecimal?,
+    val maxPrice: BigDecimal?,
+    val eventStatus: EventStatus?,
+    val fromDateTime: LocalDateTime?,
+    val toDateTime: LocalDateTime?,
+    val upcoming: Boolean?
+)

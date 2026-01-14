@@ -1,10 +1,11 @@
-package org.example.eventhub.dto.location;
+package org.example.eventhub.dto.location
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Column
+import jakarta.validation.constraints.NotBlank
 
-public record LocationCreateRequest(
-        @Column(length = 100) @NotBlank String city,
-        @Column(length = 200) @NotBlank String street,
-        @Column(length = 20) @NotBlank String house,
-        String additionalInfo) {}
+data class LocationCreateRequest(
+    @Column(length = 100) val city: @NotBlank String,
+    @Column(length = 200) val street: @NotBlank String,
+    @Column(length = 20) val house: @NotBlank String,
+    val additionalInfo: String?
+)

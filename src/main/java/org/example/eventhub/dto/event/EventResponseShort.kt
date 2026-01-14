@@ -1,5 +1,5 @@
-package org.example.eventhub.dto.event;
+package org.example.eventhub.dto.event
 
-import java.time.LocalDateTime;
+import java.time.LocalDateTime
 
-public record EventResponseShort(Long id, String title, LocalDateTime dateTime) {}
+data class EventResponseShort(val id: Long?, val title: String, val dateTime: LocalDateTime)

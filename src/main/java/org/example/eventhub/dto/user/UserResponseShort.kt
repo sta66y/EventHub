@@ -1,3 +1,3 @@
-package org.example.eventhub.dto.user;
+package org.example.eventhub.dto.user
 
-public record UserResponseShort(String username) {}
+data class UserResponseShort(val username: String)

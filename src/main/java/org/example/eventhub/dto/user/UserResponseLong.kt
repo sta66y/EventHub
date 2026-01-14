@@ -1,7 +1,13 @@
-package org.example.eventhub.dto.user;
+package org.example.eventhub.dto.user
 
-import java.time.LocalDateTime;
-import org.example.eventhub.enums.Role;
+import org.example.eventhub.enums.Role
+import java.time.LocalDateTime
 
-public record UserResponseLong(
-        Long id, String username, String email, Role role, LocalDateTime createdAt, long countOrganizedEvents) {}
+data class UserResponseLong(
+    val id: Long?,
+    val username: String,
+    val email: String,
+    val role: Role,
+    val createdAt: LocalDateTime?,
+    val countOrganizedEvents: Long
+)

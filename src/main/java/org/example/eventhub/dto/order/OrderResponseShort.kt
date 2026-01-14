@@ -1,8 +1,11 @@
-package org.example.eventhub.dto.order;
+package org.example.eventhub.dto.order
 
-import java.math.BigDecimal;
-import java.util.List;
-import org.example.eventhub.dto.ticket.TicketResponseShort;
-import org.example.eventhub.enums.OrderStatus;
+import org.example.eventhub.dto.ticket.TicketResponseShort
+import org.example.eventhub.enums.OrderStatus
+import java.math.BigDecimal
 
-public record OrderResponseShort(List<TicketResponseShort> tickets, BigDecimal totalPrice, OrderStatus orderStatus) {}
+data class OrderResponseShort(
+    val tickets: List<TicketResponseShort>,
+    val totalPrice: BigDecimal,
+    val orderStatus: OrderStatus
+)
