@@ -1,52 +1,59 @@
-package org.example.eventhub.controller;
+package org.example.eventhub.controller
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.order.OrderCreateRequest;
-import org.example.eventhub.dto.order.OrderResponseLong;
-import org.example.eventhub.dto.order.OrderResponseShort;
-import org.example.eventhub.service.OrderService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid
+import org.example.eventhub.dto.order.OrderCreateRequest
+import org.example.eventhub.dto.order.OrderResponseLong
+import org.example.eventhub.dto.order.OrderResponseShort
+import org.example.eventhub.service.OrderService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/orders")
-public class OrderController {
-
-    private final OrderService service;
-
+class OrderController (
+    private val service: OrderService
+) {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponseLong createOrder(@Valid @RequestBody OrderCreateRequest dto, @RequestParam Long userId) {
-        return service.createOrder(dto, userId);
+    fun createOrder(
+        @Valid @RequestBody dto: OrderCreateRequest,
+        @RequestParam userId: Long
+    ): OrderResponseLong {
+        return service.createOrder(dto, userId)
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponseLong getOrderById(@PathVariable Long id) {
-        return service.getOrderById(id);
+    fun getOrderById(
+        @PathVariable id: Long
+    ): OrderResponseLong {
+        return service.getOrderById(id)
     }
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    public Page<OrderResponseShort> getAllOrders(@RequestParam Long userId, Pageable pageable) {
-        return service.getAllOrders(userId, pageable);
+    fun getAllOrders(
+        @RequestParam userId: Long,
+        pageable: Pageable
+    ): Page<OrderResponseShort> {
+        return service.getAllOrders(userId, pageable)
     }
 
     @PostMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    public void cancelOrder(
-            @PathVariable Long id) {
-        service.cancelOrder(id);
+    fun cancelOrder(
+        @PathVariable id: Long
+    ) {
+        service.cancelOrder(id)
     }
 
     @PostMapping("/{id}/pay")
     @ResponseStatus(HttpStatus.OK)
-    public void payOrder(
-            @PathVariable Long id) {
-        service.payOrder(id);
+    fun payOrder(
+        @PathVariable id: Long
+    ) {
+        service.payOrder(id)
     }
 }
