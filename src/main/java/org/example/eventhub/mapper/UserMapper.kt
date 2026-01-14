@@ -8,9 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
-class UserMapper(
-    private val passwordEncoder: PasswordEncoder
-) {
+class UserMapper{
     fun toShortDto(entity: User): UserResponseShort {
         return UserResponseShort(entity.username)
     }
@@ -26,13 +24,11 @@ class UserMapper(
         )
     }
 
-    fun toEntity(dto: UserCreateRequest): User {
+    fun toEntity(dto: UserCreateRequest, password: String): User {
         return User(
             username = dto.username,
             email = dto.email,
-            password = requireNotNull(passwordEncoder.encode(dto.password)) {
-                "PasswordEncoder returned null"
-            }
+            password = password
         )
     }
 

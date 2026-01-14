@@ -26,7 +26,14 @@ class UserService(
         checkUsernameUnique(dto.username)
         checkEmailUnique(dto.email)
 
-        val user = mapper.toEntity(dto)
+        val encodedPassword = requireNotNull(
+            passwordEncoder.encode(dto.password)
+        ) {
+            "PasswordEncoder returned null"
+        }
+
+        val user = mapper.toEntity(dto, encodedPassword)
+
         return mapper.toLongDto(repository.save(user))
     }
 
