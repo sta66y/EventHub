@@ -23,36 +23,36 @@ public class UserSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            if (filter.username() != null && !filter.username().isBlank()) {
-                String lowerUsername = filter.username().toLowerCase(Locale.ROOT);
+            if (filter.getUsername() != null && !filter.getUsername().isBlank()) {
+                String lowerUsername = filter.getUsername().toLowerCase(Locale.ROOT);
                 predicates.add(cb.like(cb.lower(root.get("username")), "%" + lowerUsername + "%"));
             }
 
-            if (filter.role() != null) {
-                predicates.add(cb.equal(root.get("role"), filter.role()));
+            if (filter.getRole() != null) {
+                predicates.add(cb.equal(root.get("role"), filter.getRole()));
             }
 
-            if (filter.fromCreatedAt() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.fromCreatedAt()));
+            if (filter.getFromCreatedAt() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.getFromCreatedAt()));
             }
 
-            if (filter.toCreatedAt() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.toCreatedAt()));
+            if (filter.getToCreatedAt() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.getToCreatedAt()));
             }
 
-            if (filter.minOrganizedEvents() != null || filter.maxOrganizedEvents() != null) {
+            if (filter.getMinOrganizedEvents() != null || filter.getMaxOrganizedEvents() != null) {
                 Subquery<Long> subquery = query.subquery(Long.class);
                 Root<Event> eventRoot = subquery.from(Event.class);
                 subquery.select(cb.count(eventRoot));
                 subquery.where(cb.equal(eventRoot.get("organizer"), root));
 
-                if (filter.minOrganizedEvents() != null) {
+                if (filter.getMinOrganizedEvents() != null) {
                     predicates.add(cb.greaterThanOrEqualTo(
-                            subquery, filter.minOrganizedEvents().longValue()));
+                            subquery, filter.getMinOrganizedEvents().longValue()));
                 }
-                if (filter.maxOrganizedEvents() != null) {
+                if (filter.getMaxOrganizedEvents() != null) {
                     predicates.add(cb.lessThanOrEqualTo(
-                            subquery, filter.maxOrganizedEvents().longValue()));
+                            subquery, filter.getMaxOrganizedEvents().longValue()));
                 }
             }
 

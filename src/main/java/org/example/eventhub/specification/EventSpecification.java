@@ -20,43 +20,43 @@ public class EventSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            if (filter.title() != null && !filter.title().isBlank()) {
-                String lowerTitle = filter.title().toLowerCase();
+            if (filter.getTitle() != null && !filter.getTitle().isBlank()) {
+                String lowerTitle = filter.getTitle().toLowerCase();
                 predicates.add(cb.like(cb.lower(root.get("title")), "%" + lowerTitle + "%"));
             }
 
-            if (filter.city() != null && !filter.city().isBlank()) {
-                String lowerCity = filter.city().toLowerCase();
+            if (filter.getCity() != null && !filter.getCity().isBlank()) {
+                String lowerCity = filter.getCity().toLowerCase();
                 predicates.add(cb.like(cb.lower(root.get("location").get("city")), "%" + lowerCity + "%"));
             }
 
-            if (filter.minCapacity() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), filter.minCapacity()));
+            if (filter.getMinCapacity() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), filter.getMinCapacity()));
             }
-            if (filter.maxCapacity() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("capacity"), filter.maxCapacity()));
-            }
-
-            if (filter.minPrice() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filter.minPrice()));
-            }
-            if (filter.maxPrice() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), filter.maxPrice()));
+            if (filter.getMaxCapacity() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("capacity"), filter.getMaxCapacity()));
             }
 
-            if (filter.eventStatus() != null) {
-                predicates.add(cb.equal(root.get("eventStatus"), filter.eventStatus()));
+            if (filter.getMinPrice() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filter.getMinPrice()));
+            }
+            if (filter.getMaxPrice() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("price"), filter.getMaxPrice()));
             }
 
-            if (filter.fromDateTime() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("dateTime"), filter.fromDateTime()));
+            if (filter.getEventStatus() != null) {
+                predicates.add(cb.equal(root.get("eventStatus"), filter.getEventStatus()));
             }
 
-            if (filter.toDateTime() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("dateTime"), filter.toDateTime()));
+            if (filter.getFromDateTime() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("dateTime"), filter.getFromDateTime()));
             }
 
-            if (filter.upcoming() != null && filter.upcoming()) {
+            if (filter.getToDateTime() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("dateTime"), filter.getToDateTime()));
+            }
+
+            if (filter.getUpcoming() != null && filter.getUpcoming()) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("dateTime"), LocalDateTime.now()));
             }
 
