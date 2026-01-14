@@ -1,47 +1,44 @@
-package org.example.eventhub.service;
+package org.example.eventhub.service
 
-import jakarta.persistence.OptimisticLockException;
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.entity.Event;
-import org.example.eventhub.entity.Order;
-import org.example.eventhub.entity.Ticket;
-import org.example.eventhub.entity.User;
-import org.example.eventhub.enums.TicketStatus;
-import org.example.eventhub.exception.NoAvailableTicketsException;
-import org.example.eventhub.repository.TicketRepository;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import jakarta.persistence.OptimisticLockException
+import org.example.eventhub.entity.Order
+import org.example.eventhub.entity.Ticket
+import org.example.eventhub.exception.NoAvailableTicketsException
+import org.example.eventhub.repository.TicketRepository
+import org.springframework.stereotype.Service
 
 @Service
-@RequiredArgsConstructor
-class TicketService {
+class TicketService(
+    private val repository: TicketRepository,
+    private val userService: UserService,
+    private val eventService: EventService
+) {
 
-    private final TicketRepository repository;
-    private final UserService userService;
-    private final EventService eventService;
+    fun createTicket(
+        eventId: Long,
+        userId: Long,
+        order: Order
+    ): Ticket {
+        val user = userService.getUserByIdAsEntity(userId)
+        val event = eventService.getEventByIdAsEntity(eventId)
 
-    Ticket createTicket(Long eventId, Long userId, Order order) {
-        User user = userService.getUserByIdAsEntity(userId);
-        Event event = eventService.getEventByIdAsEntity(eventId);
-
-        event.incrementReservedCount();
+        event.incrementReservedCount()
 
         try {
-            eventService.saveEvent(event);
-        } catch (OptimisticLockException e) {
-            throw new NoAvailableTicketsException("Все билеты на мероприятие с id " + eventId + " уже распроданы");
+            eventService.saveEvent(event)
+        } catch (e: OptimisticLockException) {
+            throw NoAvailableTicketsException(
+                "Все билеты на мероприятие с id $eventId уже распроданы"
+            )
         }
 
-
         return repository.save(
-                Ticket.builder()
-                    .order(order)
-                    .event(event)
-                    .user(user)
-                    .price(event.getPrice())
-                    .build()
-        );
+            Ticket(
+                order = order,
+                event = event,
+                user = user,
+                price = event.price
+            )
+        )
     }
 }
