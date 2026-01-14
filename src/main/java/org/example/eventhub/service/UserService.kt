@@ -1,95 +1,95 @@
-package org.example.eventhub.service;
+package org.example.eventhub.service
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.example.eventhub.dto.user.*;
-import org.example.eventhub.entity.User;
-import org.example.eventhub.exception.UserAlreadyExistsException;
-import org.example.eventhub.exception.UserNotFoundException;
-import org.example.eventhub.mapper.UserMapper;
-import org.example.eventhub.repository.UserRepository;
-import org.example.eventhub.specification.UserSpecification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional
+import org.example.eventhub.dto.user.*
+import org.example.eventhub.entity.User
+import org.example.eventhub.exception.UserAlreadyExistsException
+import org.example.eventhub.exception.UserNotFoundException
+import org.example.eventhub.mapper.UserMapper
+import org.example.eventhub.repository.UserRepository
+import org.example.eventhub.specification.UserSpecification
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-public class UserService {
+class UserService(
+    private val repository: UserRepository,
+    private val mapper: UserMapper,
+    private val specification: UserSpecification,
+    private val passwordEncoder: PasswordEncoder
+) {
 
-    private final UserRepository repository;
-    private final UserMapper mapper;
-    private final UserSpecification specification;
+    fun createUser(dto: UserCreateRequest): UserResponseLong {
+        checkUsernameUnique(dto.username)
+        checkEmailUnique(dto.email)
 
-    public UserResponseLong createUser(UserCreateRequest dto) {
-        checkIsUserAlreadyExistsByUsername(dto.username());
-
-        checkIsUserAlreadyExistsByEmail(dto.email());
-
-        return mapper.toLongDto(repository.save(mapper.toEntity(dto)));
+        val user = mapper.toEntity(dto)
+        return mapper.toLongDto(repository.save(user))
     }
 
-    public Page<UserResponseShort> getAllUsers(Pageable pageable, UserFilter filter) {
-        return repository.findAll(specification.withFilter(filter), pageable).map(mapper::toShortDto);
-    }
+    fun getAllUsers(
+        pageable: Pageable,
+        filter: UserFilter
+    ): Page<UserResponseShort> =
+        repository.findAll(specification.withFilter(filter), pageable)
+            .map(mapper::toShortDto)
 
-    public UserResponseLong getUserById(Long id) {
-        User user = getUserByIdAsEntity(id);
-        return mapper.toLongDto(user);
-    }
+    fun getUserById(id: Long): UserResponseLong =
+        mapper.toLongDto(getUserByIdAsEntity(id))
 
-    public UserResponseLong getUserByUsername(String username) {
-        User user = getUserByUsernameAsEntity(username);
-        return mapper.toLongDto(user);
-    }
+    fun getUserByUsername(username: String): UserResponseLong =
+        mapper.toLongDto(getUserByUsernameAsEntity(username))
 
-    public UserResponseLong updateUser(Long id, UserUpdateRequest dto) {
-        User user = getUserByIdAsEntity(id);
+    fun updateUser(
+        id: Long,
+        dto: UserUpdateRequest
+    ): UserResponseLong {
+        val user = getUserByIdAsEntity(id)
 
-        if (dto.username() != null && !dto.username().equals(user.getUsername())) {
-            checkIsUserAlreadyExistsByUsername(dto.username());
-            user.setUsername(dto.username());
+        dto.username?.takeIf { it != user.username }?.let {
+            checkUsernameUnique(it)
+            user.username = it
         }
 
-        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
-            checkIsUserAlreadyExistsByEmail(dto.email());
-
-            user.setEmail(dto.email());
+        dto.email?.takeIf { it != user.email }?.let {
+            checkEmailUnique(it)
+            user.email = it
         }
 
-        if (dto.password() != null) {
-            user.setPassword(dto.password());
+        dto.password?.let {
+            user.password = requireNotNull(passwordEncoder.encode(it)) {
+                "PasswordEncoder returned null"
+            }
         }
 
-        return mapper.toLongDto(repository.save(user));
+        return mapper.toLongDto(user)
     }
 
-    public void deleteUser(Long id) {
-        getUserByIdAsEntity(id);
-
-        repository.deleteById(id);
+    fun deleteUser(id: Long) {
+        getUserByIdAsEntity(id)
+        repository.deleteById(id)
     }
 
-    private void checkIsUserAlreadyExistsByUsername(String username) {
-        if (repository.findByUsername(username).isPresent())
-            throw new UserAlreadyExistsException("Пользователь с username " + username + " уже существует");
+    private fun checkUsernameUnique(username: String) {
+        if (repository.findByUsername(username).isPresent) {
+            throw UserAlreadyExistsException("Пользователь с username $username уже существует")
+        }
     }
 
-    private void checkIsUserAlreadyExistsByEmail(String email) {
-        if (repository.findByEmail(email).isPresent())
-            throw new UserAlreadyExistsException("Пользователь с email " + email + " уже существует");
+    private fun checkEmailUnique(email: String) {
+        if (repository.findByEmail(email).isPresent) {
+            throw UserAlreadyExistsException("Пользователь с email $email уже существует")
+        }
     }
 
-    public User getUserByIdAsEntity(Long id) {
-        return repository
-                .findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
-    }
+    fun getUserByIdAsEntity(id: Long): User =
+        repository.findById(id)
+            .orElseThrow { UserNotFoundException("Пользователь с id $id не найден") }
 
-    User getUserByUsernameAsEntity(String username) {
-        return repository
-                .findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с username " + username + " не найден"));
-    }
+    fun getUserByUsernameAsEntity(username: String): User =
+        repository.findByUsername(username)
+            .orElseThrow { UserNotFoundException("Пользователь с username $username не найден") }
 }
