@@ -35,10 +35,17 @@ class JwtAuthenticationFilter(
                     userDetails.authorities
                 )
 
-                SecurityContextHolder.getContext().authentication = auth
+                if (SecurityContextHolder.getContext().authentication == null) {
+                    SecurityContextHolder.getContext().authentication = auth
+                }
+
             }
         }
 
         filterChain.doFilter(request, response)
     }
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean =
+        request.servletPath.startsWith("/api/v1/auth")
+
 }

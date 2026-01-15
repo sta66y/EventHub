@@ -1,5 +1,7 @@
 package org.example.eventhub.security
 
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
@@ -36,12 +38,15 @@ class JwtTokenProvider {
     }
 
     fun validate(token: String): Boolean =
-            try {
-                Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
-                true
-            } catch (e: Exception) {
-                false
-            }
+        try {
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
+            true
+        } catch (e: ExpiredJwtException) {
+            false
+        } catch (e: JwtException) {
+            false
+        }
+
 
     fun getEmail(token: String): String =
         Jwts.parser().verifyWith(secretKey).build()
