@@ -25,7 +25,7 @@ class AuthService(
 
     private fun generateToken(dto: LoginRequest): LoginResponse {
         val authToken = UsernamePasswordAuthenticationToken(
-            dto.username,
+            dto.email,
             dto.password
         )
 

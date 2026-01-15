@@ -1,5 +1,6 @@
 package org.example.eventhub.controller
 
+import jakarta.validation.Valid
 import org.example.eventhub.dto.security.LoginRequest
 import org.example.eventhub.dto.security.LoginResponse
 import org.example.eventhub.dto.security.RegisterRequest
@@ -16,8 +17,8 @@ class AuthController(
 ) {
 
     @PostMapping("/login")
-    fun login(@RequestBody dto: LoginRequest): LoginResponse = service.login(dto)
+    fun login(@Valid @RequestBody dto: LoginRequest): LoginResponse = service.login(dto)
 
     @PostMapping("/register")
-    fun register(@RequestBody dto: RegisterRequest): LoginResponse = service.register(dto)
+    fun register(@Valid @RequestBody dto: RegisterRequest): LoginResponse = service.register(dto)
 }
