@@ -8,6 +8,7 @@ import org.example.eventhub.service.OrderService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -20,6 +21,7 @@ class OrderController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('ORDER_CREATE')")
     fun createOrder(
         @Valid @RequestBody dto: OrderCreateRequest,
         @AuthenticationPrincipal user: UserDetails
@@ -28,21 +30,25 @@ class OrderController(
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ORDER_READ')")
     fun getOrderById(@RequestParam orderId: Long): OrderResponseLong =
         service.getOrderById(orderId)
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ORDER_READ')")
     fun getAllOrders(@AuthenticationPrincipal user: UserDetails, pageable: Pageable): Page<OrderResponseShort> =
         service.getAllOrders(user, pageable)
 
     @PostMapping("/{orderId}/cancel")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ORDER_CANCEL')")
     fun cancelOrder(@AuthenticationPrincipal user: UserDetails, @PathVariable orderId: Long) =
         service.cancelOrder(user, orderId)
 
     @PostMapping("/{orderId}/pay")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ORDER_PAY')")
     fun payOrder(@AuthenticationPrincipal user: UserDetails, @PathVariable orderId: Long) {
         service.payOrder(user, orderId)
     }

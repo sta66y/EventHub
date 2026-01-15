@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 class SecurityConfig {
 
     @Bean
@@ -33,15 +35,6 @@ class SecurityConfig {
             }
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/auth/**").permitAll()
-
-                it.requestMatchers("/api/v1/users/**").hasRole("USER")
-
-                it.requestMatchers("/api/v1/orders/**").hasRole("USER")
-
-                it.requestMatchers(HttpMethod.GET, "/api/v1/events/**").hasRole("USER")
-                it.requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasRole("ADMIN")
-                it.requestMatchers(HttpMethod.DELETE, "/api/v1/events/**").hasRole("ADMIN")
-                it.requestMatchers(HttpMethod.PATCH, "/api/v1/events/**").hasRole("ADMIN")
 
                 it.anyRequest().authenticated()
             }

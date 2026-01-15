@@ -6,6 +6,7 @@ import org.example.eventhub.service.EventService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -18,11 +19,13 @@ class EventController(
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('EVENT_READ')")
     fun getAllEvents(pageable: Pageable, eventFilter: EventFilter): Page<EventResponseShort> =
         service.getAllEvents(pageable, eventFilter)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('EVENT_CREATE')")
     fun createEvent(
         @Valid @RequestBody dto: EventCreateRequest,
         @AuthenticationPrincipal user: UserDetails
@@ -31,11 +34,13 @@ class EventController(
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('EVENT_READ')")
     fun getEventById(@RequestParam eventId: Long): EventResponseLong =
         service.getEventById(eventId)
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('EVENT_UPDATE')")
     fun updateEvent(
         @AuthenticationPrincipal user: UserDetails,
         @PathVariable eventId: Long,
@@ -45,6 +50,7 @@ class EventController(
 
     @DeleteMapping("/{eventId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('EVENT_DELETE')")
     fun deleteEvent(@AuthenticationPrincipal user: UserDetails, @PathVariable eventId: Long) =
         service.deleteEvent(user, eventId)
 }

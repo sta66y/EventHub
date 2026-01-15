@@ -7,6 +7,7 @@ import org.example.eventhub.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -19,10 +20,12 @@ class UserController(
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_READ')")
     fun getAllUsers(pageable: Pageable, filter: UserFilter): Page<UserResponseShort> =
         service.getAllUsers(pageable, filter)
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('USER_READ')")
     fun searchUser(
         @RequestParam(required = false) userId: Long?,
         @RequestParam(required = false) username: String?
@@ -42,6 +45,7 @@ class UserController(
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     fun updateUser(
         @AuthenticationPrincipal user: UserDetails,
         @Valid @RequestBody dto: UserUpdateRequest
@@ -50,6 +54,7 @@ class UserController(
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     fun deleteUser(@AuthenticationPrincipal user: UserDetails) =
         service.deleteUser(user)
 }
