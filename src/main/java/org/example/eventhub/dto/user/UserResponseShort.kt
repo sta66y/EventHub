@@ -1,3 +1,5 @@
 package org.example.eventhub.dto.user
 
-data class UserResponseShort(val username: String)
+data class UserResponseShort(
+    val username: String
+)
