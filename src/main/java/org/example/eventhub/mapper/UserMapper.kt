@@ -1,10 +1,9 @@
 package org.example.eventhub.mapper
 
-import org.example.eventhub.dto.user.UserCreateRequest
+import org.example.eventhub.dto.security.RegisterRequest
 import org.example.eventhub.dto.user.UserResponseLong
 import org.example.eventhub.dto.user.UserResponseShort
 import org.example.eventhub.entity.User
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,7 +23,7 @@ class UserMapper{
         )
     }
 
-    fun toEntity(dto: UserCreateRequest, password: String): User {
+    fun toEntity(dto: RegisterRequest, password: String): User {
         return User(
             username = dto.username,
             email = dto.email,

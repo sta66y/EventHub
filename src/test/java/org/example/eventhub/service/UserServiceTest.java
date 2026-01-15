@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.example.eventhub.dto.security.RegisterRequest;
 import org.example.eventhub.dto.user.*;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.Role;
@@ -37,7 +39,7 @@ class UserServiceTest {
     private final UserService userService = new UserService(repository, mapper, realSpecification);
 
     private User user;
-    private UserCreateRequest createRequest;
+    private RegisterRequest createRequest;
     private UserUpdateRequest updateRequest;
     private UserResponseLong responseLong;
     private UserResponseShort responseShort;
@@ -51,7 +53,7 @@ class UserServiceTest {
         user.setEmail(EXISTING_EMAIL);
         user.setPassword("oldPassword");
 
-        createRequest = new UserCreateRequest("new_user", "new@example.com", "password123");
+        createRequest = new RegisterRequest("new_user", "new@example.com", "password123");
 
         updateRequest = new UserUpdateRequest(NEW_USERNAME, NEW_EMAIL, "newPassword");
 
@@ -68,8 +70,8 @@ class UserServiceTest {
     @Test
     @DisplayName("createUser: успешно создаёт нового пользователя")
     void createUser_success() {
-        when(repository.findByUsername(createRequest.username())).thenReturn(Optional.empty());
-        when(repository.findByEmail(createRequest.email())).thenReturn(Optional.empty());
+        when(repository.findByUsername(createRequest.username)).thenReturn(Optional.empty());
+        when(repository.findByEmail(createRequest.email)).thenReturn(Optional.empty());
         when(mapper.toEntity(createRequest)).thenReturn(user);
         when(repository.save(user)).thenReturn(user);
         when(mapper.toLongDto(user)).thenReturn(responseLong);
@@ -83,25 +85,25 @@ class UserServiceTest {
     @Test
     @DisplayName("createUser: бросает исключение, если username уже существует")
     void createUser_usernameAlreadyExists() {
-        when(repository.findByUsername(createRequest.username())).thenReturn(Optional.of(user));
+        when(repository.findByUsername(createRequest.username)).thenReturn(Optional.of(user));
 
         UserAlreadyExistsException ex =
                 assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createRequest));
 
-        assertEquals("Пользователь с username " + createRequest.username() + " уже существует", ex.getMessage());
+        assertEquals("Пользователь с username " + createRequest.username + " уже существует", ex.getMessage());
         verify(repository, never()).save(any());
     }
 
     @Test
     @DisplayName("createUser: бросает исключение, если email уже существует")
     void createUser_emailAlreadyExists() {
-        when(repository.findByUsername(createRequest.username())).thenReturn(Optional.empty());
-        when(repository.findByEmail(createRequest.email())).thenReturn(Optional.of(user));
+        when(repository.findByUsername(createRequest.username)).thenReturn(Optional.empty());
+        when(repository.findByEmail(createRequest.email)).thenReturn(Optional.of(user));
 
         UserAlreadyExistsException ex =
                 assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createRequest));
 
-        assertEquals("Пользователь с email " + createRequest.email() + " уже существует", ex.getMessage());
+        assertEquals("Пользователь с email " + createRequest.email + " уже существует", ex.getMessage());
         verify(repository, never()).save(any());
     }
 

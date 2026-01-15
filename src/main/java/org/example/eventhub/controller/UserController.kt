@@ -1,6 +1,7 @@
 package org.example.eventhub.controller
 
 import jakarta.validation.Valid
+import org.example.eventhub.dto.security.RegisterRequest
 import org.example.eventhub.dto.user.*
 import org.example.eventhub.service.UserService
 import org.springframework.data.domain.Page
@@ -25,7 +26,7 @@ class UserController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createUser(
-        @Valid @RequestBody dto: UserCreateRequest
+        @Valid @RequestBody dto: RegisterRequest
     ): UserResponseLong {
         return service.createUser(dto)
     }

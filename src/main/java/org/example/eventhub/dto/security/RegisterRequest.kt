@@ -1,10 +1,10 @@
-package org.example.eventhub.dto.user
+package org.example.eventhub.dto.security
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-data class UserCreateRequest(
+data class RegisterRequest(
     val username: @NotBlank(message = "Username обязателен") @Size(
         min = 3,
         max = 50,

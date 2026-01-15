@@ -1,6 +1,7 @@
 package org.example.eventhub.service
 
 import jakarta.transaction.Transactional
+import org.example.eventhub.dto.security.RegisterRequest
 import org.example.eventhub.dto.user.*
 import org.example.eventhub.entity.User
 import org.example.eventhub.exception.UserAlreadyExistsException
@@ -22,7 +23,7 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
-    fun createUser(dto: UserCreateRequest): UserResponseLong {
+    fun createUser(dto: RegisterRequest): UserResponseLong {
         checkUsernameUnique(dto.username)
         checkEmailUnique(dto.email)
 
