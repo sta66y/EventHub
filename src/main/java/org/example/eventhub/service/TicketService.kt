@@ -14,11 +14,7 @@ class TicketService(
     private val eventService: EventService
 ) {
 
-    fun createTicket(
-        eventId: Long,
-        userId: Long,
-        order: Order
-    ): Ticket {
+    fun createTicket(eventId: Long, userId: Long, order: Order): Ticket {
         val user = userService.getUserByIdAsEntity(userId)
         val event = eventService.getEventByIdAsEntity(eventId)
 

@@ -19,7 +19,6 @@ import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
-import org.example.eventhub.enums.EventStatus;
 import org.example.eventhub.enums.OrderStatus;
 import org.example.eventhub.enums.TicketStatus;
 import org.example.eventhub.exception.OrderNotFoundException;
@@ -130,9 +129,9 @@ class OrderServiceTest {
         OrderResponseLong result = orderService.createOrder(createRequest, USER_ID);
 
         assertEquals(responseLong, result);
-        assertEquals(2, result.tickets().size());
-        assertEquals(BigDecimal.valueOf(3500), result.totalPrice());
-        assertEquals(userShort, result.user());
+        assertEquals(2, result.tickets.size());
+        assertEquals(BigDecimal.valueOf(3500), result.totalPrice);
+        assertEquals(userShort, result.user);
 
         verify(ticketService, times(2)).createTicket(anyLong(), eq(USER_ID), any(Order.class));
         verify(repository)
@@ -149,8 +148,8 @@ class OrderServiceTest {
         OrderResponseLong result = orderService.getOrderById(EXISTING_ORDER_ID);
 
         assertEquals(responseLong, result);
-        assertEquals(userShort, result.user());
-        assertEquals(2, result.tickets().size());
+        assertEquals(userShort, result.user);
+        assertEquals(2, result.tickets.size());
     }
 
     @Test
@@ -176,8 +175,8 @@ class OrderServiceTest {
 
         assertEquals(1, result.getTotalElements());
         assertEquals(responseShort, result.getContent().get(0));
-        assertEquals(2, result.getContent().get(0).tickets().size());
-        assertEquals(BigDecimal.valueOf(3500), result.getContent().get(0).totalPrice());
+        assertEquals(2, result.getContent().get(0).tickets.size());
+        assertEquals(BigDecimal.valueOf(3500), result.getContent().get(0).totalPrice);
     }
 
     @Test

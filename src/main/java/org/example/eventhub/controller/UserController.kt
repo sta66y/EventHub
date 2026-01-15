@@ -7,6 +7,8 @@ import org.example.eventhub.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,53 +16,32 @@ import org.springframework.web.bind.annotation.*
 class UserController(
     private val service: UserService
 ) {
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun getAllUsers(
-        pageable: Pageable,
-        filter: UserFilter
-    ): Page<UserResponseShort> {
-        return service.getAllUsers(pageable, filter)
-    }
+    fun getAllUsers(pageable: Pageable, filter: UserFilter): Page<UserResponseShort> =
+        service.getAllUsers(pageable, filter)
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createUser(
-        @Valid @RequestBody dto: RegisterRequest
-    ): UserResponseLong {
-        return service.createUser(dto)
-    }
-
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getUserById(
-        @PathVariable id: Long
-    ): UserResponseLong {
-        return service.getUserById(id)
-    }
+    fun getUserById(@PathVariable userId: Long): UserResponseLong =
+        service.getUserById(userId)
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    fun getUserByUsername(
-        @RequestParam username: String
-    ): UserResponseLong {
-        return service.getUserByUsername(username)
-    }
+    fun getUserByUsername(@RequestParam username: String): UserResponseLong =
+        service.getUserByUsername(username)
 
-    @PatchMapping("/{id}")
+    @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     fun updateUser(
-        @PathVariable id: Long,
+        @AuthenticationPrincipal user: UserDetails,
         @Valid @RequestBody dto: UserUpdateRequest
-    ): UserResponseLong {
-        return service.updateUser(id, dto)
-    }
+    ): UserResponseLong =
+        service.updateUser(user, dto)
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteUser(
-        @PathVariable id: Long
-    ) {
-        service.deleteUser(id)
-    }
+    fun deleteUser(@AuthenticationPrincipal user: UserDetails) =
+        service.deleteUser(user)
 }

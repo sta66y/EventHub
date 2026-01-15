@@ -169,12 +169,12 @@ class EventSpecificationTest {
         Predicate predicate = mock(Predicate.class);
 
         when(root.get("eventStatus")).thenReturn(statusPath);
-        when(cb.equal(statusPath, filter.eventStatus())).thenReturn(predicate);
+        when(cb.equal(statusPath, filter.eventStatus)).thenReturn(predicate);
 
         Specification<Event> spec = specification.withFilter(filter);
         spec.toPredicate(root, query, cb);
 
-        verify(cb).equal(statusPath, filter.eventStatus());
+        verify(cb).equal(statusPath, filter.eventStatus);
         verify(cb).and(any(Predicate[].class));
     }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class LocationMapper {
+
     fun toEntity(dto: LocationCreateRequest): Location {
         return Location(dto.city, dto.street, dto.house, dto.additionalInfo)
     }

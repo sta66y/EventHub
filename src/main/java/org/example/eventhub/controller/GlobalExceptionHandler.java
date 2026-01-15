@@ -50,6 +50,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(NoAccessException.class)
+    public ResponseEntity<AppError> handleNoAccess(NoAccessException ex) {
+        return new ResponseEntity<>(new AppError(ex.getMessage(), HttpStatus.FORBIDDEN.value()), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

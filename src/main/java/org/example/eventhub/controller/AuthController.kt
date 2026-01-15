@@ -5,9 +5,11 @@ import org.example.eventhub.dto.security.LoginRequest
 import org.example.eventhub.dto.security.LoginResponse
 import org.example.eventhub.dto.security.RegisterRequest
 import org.example.eventhub.service.AuthService
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -16,9 +18,13 @@ class AuthController(
     private val service: AuthService
 ) {
 
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/login")
-    fun login(@Valid @RequestBody dto: LoginRequest): LoginResponse = service.login(dto)
+    fun login(@Valid @RequestBody dto: LoginRequest): LoginResponse =
+        service.login(dto)
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    fun register(@Valid @RequestBody dto: RegisterRequest): LoginResponse = service.register(dto)
+    fun register(@Valid @RequestBody dto: RegisterRequest): LoginResponse =
+        service.register(dto)
 }

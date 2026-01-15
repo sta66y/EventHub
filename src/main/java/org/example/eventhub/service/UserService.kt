@@ -11,6 +11,7 @@ import org.example.eventhub.repository.UserRepository
 import org.example.eventhub.specification.UserSpecification
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -52,10 +53,10 @@ class UserService(
         mapper.toLongDto(getUserByUsernameAsEntity(username))
 
     fun updateUser(
-        id: Long,
+        userDetails: UserDetails,
         dto: UserUpdateRequest
     ): UserResponseLong {
-        val user = getUserByIdAsEntity(id)
+        val user = getUserByUsernameAsEntity(userDetails.username)
 
         dto.username?.takeIf { it != user.username }?.let {
             checkUsernameUnique(it)
@@ -76,9 +77,9 @@ class UserService(
         return mapper.toLongDto(user)
     }
 
-    fun deleteUser(id: Long) {
-        getUserByIdAsEntity(id)
-        repository.deleteById(id)
+    fun deleteUser(userDetails: UserDetails) {
+        val user = getUserByUsername(userDetails.username)
+        repository.deleteById(user.id)
     }
 
     private fun checkUsernameUnique(username: String) {

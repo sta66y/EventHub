@@ -14,6 +14,7 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val userService: UserService
 ) {
+
     fun login(dto: LoginRequest): LoginResponse =
         generateToken(dto)
 

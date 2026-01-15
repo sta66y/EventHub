@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import org.example.eventhub.dto.event.*;
 import org.example.eventhub.dto.location.LocationCreateRequest;
 import org.example.eventhub.dto.location.LocationResponseLong;
@@ -14,6 +16,7 @@ import org.example.eventhub.entity.Event;
 import org.example.eventhub.entity.Location;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.EventStatus;
+import org.example.eventhub.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,34 +38,44 @@ class EventMapperTest {
     private EventMapper eventMapper;
 
     private User organizer;
-    private Event event;
     private Location location;
+    private Event event;
 
     private EventCreateRequest createRequest;
     private EventUpdateRequest updateRequest;
 
     @BeforeEach
     void setUp() {
-        organizer = User.builder().id(10L).username("organizer").build();
+        organizer = new User(
+                10L,
+                "organizer",
+                "org@mail.com",
+                "password",
+                Role.USER,
+                LocalDateTime.now(),
+                new ArrayList<>()
+        );
 
-        location = Location.builder()
-                .city("Moscow")
-                .street("Tverskaya")
-                .house("10")
-                .additionalInfo("near metro")
-                .build();
+        location = new Location(
+                "Moscow",
+                "Tverskaya",
+                "10",
+                "near metro"
+        );
 
-        event = Event.builder()
-                .id(1L)
-                .title("Concert")
-                .description("Great show")
-                .dateTime(LocalDateTime.of(2026, 1, 15, 20, 0))
-                .location(location)
-                .capacity(500)
-                .price(BigDecimal.valueOf(3000))
-                .eventStatus(EventStatus.PUBLISHED)
-                .organizer(organizer)
-                .build();
+        event = new Event(
+                1L,
+                "Concert",
+                "Great show",
+                LocalDateTime.of(2026, 1, 15, 20, 0),
+                location,
+                500,
+                BigDecimal.valueOf(3000),
+                organizer,
+                EventStatus.PUBLISHED,
+                new ArrayList<>(),
+                null
+        );
 
         createRequest = new EventCreateRequest(
                 "New Event",
@@ -71,7 +84,8 @@ class EventMapperTest {
                 new LocationCreateRequest("SPb", "Nevsky", "5", null),
                 300,
                 BigDecimal.valueOf(2000),
-                EventStatus.DRAFT);
+                EventStatus.DRAFT
+        );
 
         updateRequest = new EventUpdateRequest(
                 "Updated Title",
@@ -80,22 +94,26 @@ class EventMapperTest {
                 new LocationUpdateRequest("Kazan", null, null, "center"),
                 400,
                 BigDecimal.valueOf(2500),
-                EventStatus.PUBLISHED);
+                EventStatus.PUBLISHED
+        );
     }
 
     @Test
-    @DisplayName("toShortDto: возвращает правильный Short DTO")
+    @DisplayName("toShortDto: возвращает корректный Short DTO")
     void toShortDto_shouldReturnCorrectDto() {
-        EventResponseShort expected = new EventResponseShort(1L, "Concert", LocalDateTime.of(2026, 1, 15, 20, 0));
+        EventResponseShort expected =
+                new EventResponseShort(1L, "Concert",
+                        LocalDateTime.of(2026, 1, 15, 20, 0));
 
         assertEquals(expected, eventMapper.toShortDto(event));
     }
 
     @Test
-    @DisplayName("toLongDto: возвращает правильный Long DTO с маппингом вложенных объектов")
+    @DisplayName("toLongDto: корректно маппит Event в Long DTO")
     void toLongDto_shouldReturnCorrectDto() {
         UserResponseShort organizerShort = new UserResponseShort("organizer");
-        LocationResponseLong locationLong = new LocationResponseLong("Moscow", "Tverskaya", "10", "near metro");
+        LocationResponseLong locationLong =
+                new LocationResponseLong("Moscow", "Tverskaya", "10", "near metro");
 
         when(userMapper.toShortDto(organizer)).thenReturn(organizerShort);
         when(locationMapper.toLongDto(location)).thenReturn(locationLong);
@@ -109,7 +127,8 @@ class EventMapperTest {
                 500,
                 BigDecimal.valueOf(3000),
                 EventStatus.PUBLISHED,
-                organizerShort);
+                organizerShort
+        );
 
         assertEquals(expected, eventMapper.toLongDto(event));
 
@@ -118,15 +137,16 @@ class EventMapperTest {
     }
 
     @Test
-    @DisplayName("toEntity: маппит CreateRequest в новую сущность Event с вложенной Location")
+    @DisplayName("toEntity: корректно маппит CreateRequest в Event")
     void toEntity_shouldMapCreateRequestCorrectly() {
-        LocationCreateRequest locDto = createRequest.location;
-        Location newLocation = Location.builder()
-                .city("SPb")
-                .street("Nevsky")
-                .house("5")
-                .additionalInfo(null)
-                .build();
+        LocationCreateRequest locDto = createRequest.getLocation();
+
+        Location newLocation = new Location(
+                "SPb",
+                "Nevsky",
+                "5",
+                null
+        );
 
         when(locationMapper.toEntity(locDto)).thenReturn(newLocation);
 
@@ -145,7 +165,7 @@ class EventMapperTest {
     }
 
     @Test
-    @DisplayName("updateEntity: обновляет только переданные поля, включая частичное обновление Location")
+    @DisplayName("updateEntity: обновляет только переданные поля, включая Location")
     void updateEntity_shouldUpdateOnlyProvidedFields() {
         Location existingLocation = event.getLocation();
 
@@ -167,14 +187,15 @@ class EventMapperTest {
     }
 
     @Test
-    @DisplayName("updateEntity: не меняет поля, если они null в UpdateRequest")
+    @DisplayName("updateEntity: не меняет поля, если UpdateRequest пустой")
     void updateEntity_shouldNotChangeFieldsWhenNull() {
-        EventUpdateRequest partial = new EventUpdateRequest(null, null, null, null, null, null, null);
+        EventUpdateRequest empty =
+                new EventUpdateRequest(null, null, null, null, null, null, null);
 
         String originalTitle = event.getTitle();
         LocalDateTime originalDate = event.getDateTime();
 
-        eventMapper.updateEntity(partial, event);
+        eventMapper.updateEntity(empty, event);
 
         assertEquals(originalTitle, event.getTitle());
         assertEquals(originalDate, event.getDateTime());

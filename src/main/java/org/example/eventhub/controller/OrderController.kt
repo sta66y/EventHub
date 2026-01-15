@@ -8,52 +8,42 @@ import org.example.eventhub.service.OrderService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/orders")
-class OrderController (
+class OrderController(
     private val service: OrderService
 ) {
+
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     fun createOrder(
         @Valid @RequestBody dto: OrderCreateRequest,
-        @RequestParam userId: Long
-    ): OrderResponseLong {
-        return service.createOrder(dto, userId)
-    }
+        @AuthenticationPrincipal user: UserDetails
+    ): OrderResponseLong =
+        service.createOrder(dto, user)
 
-    @GetMapping("/{id}")
+    @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getOrderById(
-        @PathVariable id: Long
-    ): OrderResponseLong {
-        return service.getOrderById(id)
-    }
+    fun getOrderById(@PathVariable orderId: Long): OrderResponseLong =
+        service.getOrderById(orderId)
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    fun getAllOrders(
-        @RequestParam userId: Long,
-        pageable: Pageable
-    ): Page<OrderResponseShort> {
-        return service.getAllOrders(userId, pageable)
-    }
+    fun getAllOrders(@AuthenticationPrincipal user: UserDetails, pageable: Pageable): Page<OrderResponseShort> =
+        service.getAllOrders(user, pageable)
 
-    @PostMapping("/{id}/cancel")
+    @PostMapping("/{orderId}/cancel")
     @ResponseStatus(HttpStatus.OK)
-    fun cancelOrder(
-        @PathVariable id: Long
-    ) {
-        service.cancelOrder(id)
-    }
+    fun cancelOrder(@AuthenticationPrincipal user: UserDetails, @PathVariable orderId: Long) =
+        service.cancelOrder(user, orderId)
 
-    @PostMapping("/{id}/pay")
+    @PostMapping("/{orderId}/pay")
     @ResponseStatus(HttpStatus.OK)
-    fun payOrder(
-        @PathVariable id: Long
-    ) {
-        service.payOrder(id)
+    fun payOrder(@AuthenticationPrincipal user: UserDetails, @PathVariable orderId: Long) {
+        service.payOrder(user, orderId)
     }
 }

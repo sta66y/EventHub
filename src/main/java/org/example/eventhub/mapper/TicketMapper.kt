@@ -10,6 +10,7 @@ class TicketMapper (
     private val eventMapper: EventMapper,
     private val userMapper: UserMapper
 ){
+
     fun toLongDto(entity: Ticket): TicketResponseLong {
         return TicketResponseLong(
             id = entity.id,

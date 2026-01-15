@@ -6,6 +6,8 @@ import org.example.eventhub.service.EventService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -16,36 +18,33 @@ class EventController(
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun getAllEvents(
-        pageable: Pageable,
-        eventFilter: EventFilter
-    ): Page<EventResponseShort> =
+    fun getAllEvents(pageable: Pageable, eventFilter: EventFilter): Page<EventResponseShort> =
         service.getAllEvents(pageable, eventFilter)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createEvent(
         @Valid @RequestBody dto: EventCreateRequest,
-        @RequestParam organizerId: Long
+        @AuthenticationPrincipal user: UserDetails
     ): EventResponseLong =
-        service.createEvent(dto, organizerId)
+        service.createEvent(dto, user)
 
-    @GetMapping("/{id}")
+    @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getEventById(@PathVariable id: Long): EventResponseLong =
-        service.getEventById(id)
+    fun getEventById(@PathVariable eventId: Long): EventResponseLong =
+        service.getEventById(eventId)
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     fun updateEvent(
-        @PathVariable id: Long,
+        @AuthenticationPrincipal user: UserDetails,
+        @PathVariable eventId: Long,
         @Valid @RequestBody dto: EventUpdateRequest
     ): EventResponseLong =
-        service.updateEvent(id, dto)
+        service.updateEvent(user, eventId, dto)
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{eventId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteEvent(@PathVariable id: Long) {
-        service.deleteEvent(id)
-    }
+    fun deleteEvent(@AuthenticationPrincipal user: UserDetails, @PathVariable eventId: Long) =
+        service.deleteEvent(user, eventId)
 }

@@ -3,16 +3,19 @@ package org.example.eventhub.service
 import org.example.eventhub.dto.order.OrderCreateRequest
 import org.example.eventhub.dto.order.OrderResponseLong
 import org.example.eventhub.dto.order.OrderResponseShort
+import org.example.eventhub.entity.Event
 import org.example.eventhub.entity.Order
 import org.example.eventhub.entity.Ticket
 import org.example.eventhub.enums.OrderStatus
 import org.example.eventhub.enums.TicketStatus
+import org.example.eventhub.exception.NoAccessException
 import org.example.eventhub.exception.OrderNotFoundException
 import org.example.eventhub.mapper.OrderMapper
 import org.example.eventhub.repository.OrderRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -20,15 +23,15 @@ import java.time.LocalDateTime
 
 @Service
 @Transactional
-open class OrderService(
+class OrderService(
     private val userService: UserService,
     private val ticketService: TicketService,
     private val mapper: OrderMapper,
     private val repository: OrderRepository
 ) {
 
-    fun createOrder(dto: OrderCreateRequest, userId: Long): OrderResponseLong {
-        val user = userService.getUserByIdAsEntity(userId)
+    fun createOrder(dto: OrderCreateRequest, userDetails: UserDetails): OrderResponseLong {
+        val user = userService.getUserByUsernameAsEntity(userDetails.username)
 
         val order = Order(
             user = user,
@@ -36,7 +39,7 @@ open class OrderService(
             totalPrice = BigDecimal.ZERO,
         )
 
-        reserveTickets(order, dto.eventsId, userId)
+        reserveTickets(order, dto.eventsId, user.id!!)
 
         return mapper.toLongDto(repository.save(order))
     }
@@ -61,8 +64,10 @@ open class OrderService(
         }
     }
 
-    fun payOrder(orderId: Long) {
+    fun payOrder(userDetails: UserDetails, orderId: Long) {
         val order = getOrderByIdAsEntity(orderId)
+
+        checkAccess(userDetails, order)
 
         if (order.status != OrderStatus.PENDING) {
             error("Нельзя оплатить заказ в статусе ${order.status}")
@@ -72,8 +77,10 @@ open class OrderService(
         order.tickets.forEach { it.status = TicketStatus.PAID }
     }
 
-    fun cancelOrder(orderId: Long) {
+    fun cancelOrder(userDetails: UserDetails, orderId: Long) {
         val order = getOrderByIdAsEntity(orderId)
+
+        checkAccess(userDetails, order)
 
         if (order.status != OrderStatus.PENDING) {
             error("Нельзя отменить заказ в статусе ${order.status}")
@@ -106,14 +113,26 @@ open class OrderService(
         order.tickets = tickets
     }
 
-    fun getOrderById(id: Long): OrderResponseLong =
-        mapper.toLongDto(getOrderByIdAsEntity(id))
+    fun getOrderById(orderId: Long): OrderResponseLong =
+        mapper.toLongDto(getOrderByIdAsEntity(orderId))
 
-    fun getAllOrders(userId: Long, pageable: Pageable): Page<OrderResponseShort> =
-        repository.findAllByUserId(userId, pageable)
+    fun getAllOrders(userDetails: UserDetails, pageable: Pageable): Page<OrderResponseShort> {
+        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+
+        return repository.findAllByUserId(user.id, pageable)
             .map(mapper::toShortDto)
+    }
 
-    private fun getOrderByIdAsEntity(id: Long): Order =
-        repository.findById(id)
-            .orElseThrow { OrderNotFoundException("Ордера с id $id не существует") }
+    private fun getOrderByIdAsEntity(orderId: Long): Order =
+        repository.findById(orderId)
+            .orElseThrow { OrderNotFoundException("Заказа с id $orderId не существует") }
+
+    private fun checkAccess(userDetails: UserDetails, order: Order) {
+        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+
+        if (order.user != user)
+            throw NoAccessException(
+                "Вы не можете взаимодействовать с заказом ${order.id}"
+            )
+    }
 }

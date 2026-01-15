@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserMapper{
+
     fun toShortDto(entity: User): UserResponseShort {
         return UserResponseShort(entity.username)
     }

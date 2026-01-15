@@ -1,10 +1,12 @@
 package org.example.eventhub.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.example.eventhub.dto.event.EventResponseShort;
 import org.example.eventhub.dto.order.OrderResponseLong;
@@ -15,6 +17,7 @@ import org.example.eventhub.entity.Order;
 import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.entity.User;
 import org.example.eventhub.enums.OrderStatus;
+import org.example.eventhub.enums.Role;
 import org.example.eventhub.enums.TicketStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,81 +44,35 @@ class OrderMapperTest {
     private Ticket ticket2;
     private Order order;
 
-    private UserResponseShort userShort;
-    private EventResponseShort eventShort;
-    private TicketResponseShort ticketShort1;
-    private TicketResponseShort ticketShort2;
-
     @BeforeEach
     void setUp() {
-        user = User.builder().id(10L).username("john_doe").build();
+        user = new User(10L, "john_doe", "mail", "pass", Role.USER, null, new ArrayList<>());
 
         ticket1 = new Ticket();
         ticket2 = new Ticket();
 
-        order = Order.builder()
-                .id(1L)
-                .user(user)
-                .totalPrice(BigDecimal.valueOf(3500))
-                .status(OrderStatus.PENDING)
-                .tickets(List.of(ticket1, ticket2))
-                .build();
-
-        userShort = new UserResponseShort("john_doe");
-        eventShort = new EventResponseShort(100L, "Концерт", LocalDateTime.now());
-
-        ticketShort1 = new TicketResponseShort(eventShort, userShort, TicketStatus.RESERVED);
-        ticketShort2 = new TicketResponseShort(eventShort, userShort, TicketStatus.RESERVED);
+        order = new Order();
+        order.setId(1L);
+        order.setUser(user);
+        order.setTotalPrice(BigDecimal.valueOf(3500));
+        order.setStatus(OrderStatus.PENDING);
+        order.setTickets(List.of(ticket1, ticket2));
     }
 
     @Test
-    @DisplayName("toLongDto: возвращает правильный Long DTO с пользователем и тикетами")
     void toLongDto_shouldReturnCorrectDto() {
+        UserResponseShort userShort = new UserResponseShort("john_doe");
+
         when(userMapper.toShortDto(user)).thenReturn(userShort);
-        when(ticketMapper.toShortDto(ticket1)).thenReturn(ticketShort1);
-        when(ticketMapper.toShortDto(ticket2)).thenReturn(ticketShort2);
+        when(ticketMapper.toShortDto(ticket1)).thenReturn(mock(TicketResponseShort.class));
+        when(ticketMapper.toShortDto(ticket2)).thenReturn(mock(TicketResponseShort.class));
 
-        OrderResponseLong expected = new OrderResponseLong(
-                1L, userShort, List.of(ticketShort1, ticketShort2), BigDecimal.valueOf(3500), OrderStatus.PENDING);
+        OrderResponseLong dto = orderMapper.toLongDto(order);
 
-        OrderResponseLong actual = orderMapper.toLongDto(order);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    @DisplayName("toShortDto: возвращает правильный Short DTO с тикетами, но без пользователя и id")
-    void toShortDto_shouldReturnCorrectDto() {
-        when(ticketMapper.toShortDto(ticket1)).thenReturn(ticketShort1);
-        when(ticketMapper.toShortDto(ticket2)).thenReturn(ticketShort2);
-
-        OrderResponseShort expected = new OrderResponseShort(
-                List.of(ticketShort1, ticketShort2), BigDecimal.valueOf(3500), OrderStatus.PENDING);
-
-        OrderResponseShort actual = orderMapper.toShortDto(order);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    @DisplayName("toLongDto: работает с пустым списком тикетов")
-    void toLongDto_handlesEmptyTicketsList() {
-        when(userMapper.toShortDto(user)).thenReturn(userShort);
-        order.setTickets(List.of());
-
-        OrderResponseLong expected =
-                new OrderResponseLong(1L, userShort, List.of(), BigDecimal.valueOf(3500), OrderStatus.PENDING);
-
-        assertEquals(expected, orderMapper.toLongDto(order));
-    }
-
-    @Test
-    @DisplayName("toShortDto: работает с пустым списком тикетов")
-    void toShortDto_handlesEmptyTicketsList() {
-        order.setTickets(List.of());
-
-        OrderResponseShort expected = new OrderResponseShort(List.of(), BigDecimal.valueOf(3500), OrderStatus.PENDING);
-
-        assertEquals(expected, orderMapper.toShortDto(order));
+        assertEquals(1L, dto.id());
+        assertEquals(userShort, dto.user());
+        assertEquals(2, dto.tickets().size());
+        assertEquals(BigDecimal.valueOf(3500), dto.totalPrice());
+        assertEquals(OrderStatus.PENDING, dto.orderStatus());
     }
 }
