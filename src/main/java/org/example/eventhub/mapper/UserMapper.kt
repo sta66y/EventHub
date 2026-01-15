@@ -9,12 +9,11 @@ import org.springframework.stereotype.Component
 @Component
 class UserMapper{
 
-    fun toShortDto(entity: User): UserResponseShort {
-        return UserResponseShort(entity.username)
-    }
+    fun toShortDto(entity: User): UserResponseShort =
+        UserResponseShort(entity.username)
 
-    fun toLongDto(entity: User): UserResponseLong {
-        return UserResponseLong(
+    fun toLongDto(entity: User): UserResponseLong =
+        UserResponseLong(
             id = entity.id,
             username = entity.username,
             email = entity.email,
@@ -22,14 +21,11 @@ class UserMapper{
             createdAt =  entity.createdAt,
             countOrganizedEvents =  entity.organizedEvents.size.toLong()
         )
-    }
 
-    fun toEntity(dto: RegisterRequest, password: String): User {
-        return User(
+    fun toEntity(dto: RegisterRequest, password: String): User =
+        User(
             username = dto.username,
             email = dto.email,
             password = password
         )
-    }
-
 }

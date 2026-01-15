@@ -78,8 +78,8 @@ class UserService(
     }
 
     fun deleteUser(userDetails: UserDetails) {
-        val user = getUserByUsername(userDetails.username)
-        repository.deleteById(user.id!!)
+        val user = getUserByUsernameAsEntity(userDetails.username)
+        repository.delete(user)
     }
 
     private fun checkUsernameUnique(username: String) {

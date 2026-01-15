@@ -11,21 +11,19 @@ class OrderMapper(
     private val ticketMapper: TicketMapper
 ) {
 
-    fun toLongDto(entity: Order): OrderResponseLong {
-        return OrderResponseLong(
+    fun toLongDto(entity: Order): OrderResponseLong =
+        OrderResponseLong(
             id = entity.id,
             user = userMapper.toShortDto(entity.user),
             tickets = entity.tickets.map { ticketMapper.toShortDto(it) },
             totalPrice = entity.totalPrice,
             orderStatus = entity.status
         )
-    }
 
-    fun toShortDto(entity: Order): OrderResponseShort {
-        return OrderResponseShort(
+    fun toShortDto(entity: Order): OrderResponseShort =
+        OrderResponseShort(
             tickets = entity.tickets.map { ticketMapper.toShortDto(it) },
             totalPrice = entity.totalPrice,
             orderStatus = entity.status
         )
-    }
 }

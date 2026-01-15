@@ -7,15 +7,16 @@ import org.example.eventhub.exception.NoAvailableTicketsException
 import org.example.eventhub.repository.TicketRepository
 import org.springframework.stereotype.Service
 
+import org.example.eventhub.entity.User
+
+
 @Service
 class TicketService(
     private val repository: TicketRepository,
-    private val userService: UserService,
     private val eventService: EventService
 ) {
 
-    fun createTicket(eventId: Long, userId: Long, order: Order): Ticket {
-        val user = userService.getUserByIdAsEntity(userId)
+    fun createTicket(eventId: Long, user: User, order: Order): Ticket {
         val event = eventService.getEventByIdAsEntity(eventId)
 
         event.incrementReservedCount()

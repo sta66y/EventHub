@@ -9,17 +9,14 @@ import org.springframework.stereotype.Component
 @Component
 class LocationMapper {
 
-    fun toEntity(dto: LocationCreateRequest): Location {
-        return Location(dto.city, dto.street, dto.house, dto.additionalInfo)
-    }
+    fun toEntity(dto: LocationCreateRequest): Location =
+        Location(dto.city, dto.street, dto.house, dto.additionalInfo)
 
-    fun toEntity(dto: LocationUpdateRequest): Location {
-        return Location(dto.city, dto.street, dto.house, dto.additionalInfo)
-    }
+    fun toEntity(dto: LocationUpdateRequest): Location =
+        Location(dto.city, dto.street, dto.house, dto.additionalInfo)
 
-    fun toLongDto(entity: Location?): LocationResponseLong {
-        return LocationResponseLong(
+    fun toLongDto(entity: Location?): LocationResponseLong? =
+        LocationResponseLong(
             entity?.city, entity?.street, entity?.house, entity?.additionalInfo
         )
-    }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable
 
 @Embeddable
 class Location(
+
     @Column(length = 100)
     var city: String? = null,
 

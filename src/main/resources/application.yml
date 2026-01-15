@@ -20,3 +20,7 @@ spring:
     level:
       org.hibernate.SQL: DEBUG
       org.hibernate.orm.jdbc.bind: TRACE
+
+jwt:
+  secret: super-long-random-256-bit-key
+  validity: 3600000

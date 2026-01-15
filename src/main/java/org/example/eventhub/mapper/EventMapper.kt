@@ -14,8 +14,8 @@ class EventMapper(
     private val locationMapper: LocationMapper
 ) {
 
-    fun toEntity(dto: EventCreateRequest, user: User): Event {
-        return Event(
+    fun toEntity(dto: EventCreateRequest, user: User): Event =
+        Event(
             title = dto.title,
             dateTime = dto.dateTime,
             capacity = dto.capacity,
@@ -26,34 +26,32 @@ class EventMapper(
             dto.eventStatus?.let { eventStatus = it }
             dto.price?.let { price = it }
         }
-    }
 
-    fun updateEntity(dto: EventUpdateRequest, event: Event) {
+    fun updateEntity(dto: EventUpdateRequest, event: Event) =
         event.apply {
-            dto.title?.let { event.title = it }
-            dto.description?.let { event.description = it }
-            dto.dateTime?.let { event.dateTime = it }
+            dto.title?.let { title = it }
+            dto.description?.let { description = it }
+            dto.dateTime?.let { dateTime = it }
 
             dto.location?.let { locDto ->
-                val loc = event.location
+                val loc = location
                 if (loc != null) {
                     locDto.city?.let { loc.city = it }
                     locDto.street?.let { loc.street = it }
                     locDto.house?.let { loc.house = it }
                     locDto.additionalInfo?.let { loc.additionalInfo = it }
                 } else {
-                    event.location = locationMapper.toEntity(locDto)
+                    location = locationMapper.toEntity(locDto)
                 }
             }
 
-            dto.capacity?.let { event.capacity = it }
-            dto.price?.let { event.price = it }
-            dto.eventStatus?.let { event.eventStatus = it }
+            dto.capacity?.let { capacity = it }
+            dto.price?.let { price = it }
+            dto.eventStatus?.let { eventStatus = it }
         }
-    }
 
-    fun toLongDto(entity: Event): EventResponseLong {
-        return EventResponseLong(
+    fun toLongDto(entity: Event): EventResponseLong =
+        EventResponseLong(
             id = entity.id,
             title = entity.title,
             description = entity.description,
@@ -64,7 +62,6 @@ class EventMapper(
             eventStatus = entity.eventStatus,
             organizer = userMapper.toShortDto(entity.organizer)
         )
-    }
 
     fun toShortDto(entity: Event): EventResponseShort =
         EventResponseShort(

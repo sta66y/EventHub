@@ -11,8 +11,8 @@ class TicketMapper (
     private val userMapper: UserMapper
 ){
 
-    fun toLongDto(entity: Ticket): TicketResponseLong {
-        return TicketResponseLong(
+    fun toLongDto(entity: Ticket): TicketResponseLong =
+        TicketResponseLong(
             id = entity.id,
             event = eventMapper.toShortDto(entity.event),
             user = userMapper.toShortDto(entity.user),
@@ -20,13 +20,11 @@ class TicketMapper (
             price = entity.price,
             ticketStatus = entity.status
         )
-    }
 
-    fun toShortDto(entity: Ticket): TicketResponseShort {
-        return TicketResponseShort(
+    fun toShortDto(entity: Ticket): TicketResponseShort =
+        TicketResponseShort(
             event = eventMapper.toShortDto(entity.event),
             user = userMapper.toShortDto(entity.user),
             ticketStatus = entity.status
         )
-    }
 }

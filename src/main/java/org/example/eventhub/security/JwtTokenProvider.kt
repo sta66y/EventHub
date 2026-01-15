@@ -2,17 +2,22 @@ package org.example.eventhub.security
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.Date
 
 @Component
 class JwtTokenProvider {
 
-    private val secretKey = Keys.hmacShaKeyFor(
-        "secret".toByteArray()
-    )
+    @Value("\${jwt.secret}")
+    lateinit var secret: String
 
-    private val validityInMs = 60 * 60 * 1000
+    private val secretKey by lazy {
+        Keys.hmacShaKeyFor(secret.toByteArray())
+    }
+
+    @Value("\${jwt.validity}")
+    private var validityInMs: Long = 0
 
     fun generateToken(
         username: String,
@@ -38,7 +43,7 @@ class JwtTokenProvider {
                 false
             }
 
-    fun getUsername(token: String): String =
+    fun getEmail(token: String): String =
         Jwts.parser().verifyWith(secretKey).build()
             .parseSignedClaims(token)
             .payload.subject

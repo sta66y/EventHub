@@ -7,7 +7,7 @@ import org.example.eventhub.enums.EventStatus
 import org.example.eventhub.exception.NoAvailableTicketsException
 
 @Entity
-class Event @JvmOverloads constructor(
+class Event(
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -38,7 +38,7 @@ class Event @JvmOverloads constructor(
     @Column(nullable = false)
     var eventStatus: EventStatus = EventStatus.DRAFT,
 
-    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], orphanRemoval = true)
     var tickets: MutableList<Ticket> = mutableListOf(),
 
     @Version

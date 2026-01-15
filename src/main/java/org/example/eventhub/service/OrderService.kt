@@ -3,7 +3,7 @@ package org.example.eventhub.service
 import org.example.eventhub.dto.order.OrderCreateRequest
 import org.example.eventhub.dto.order.OrderResponseLong
 import org.example.eventhub.dto.order.OrderResponseShort
-import org.example.eventhub.entity.Event
+import org.example.eventhub.entity.User
 import org.example.eventhub.entity.Order
 import org.example.eventhub.entity.Ticket
 import org.example.eventhub.enums.OrderStatus
@@ -39,7 +39,7 @@ class OrderService(
             totalPrice = BigDecimal.ZERO,
         )
 
-        reserveTickets(order, dto.eventsId, user.id!!)
+        reserveTickets(order, dto.eventsId, user)
 
         return mapper.toLongDto(repository.save(order))
     }
@@ -98,15 +98,15 @@ class OrderService(
     private fun reserveTickets(
         order: Order,
         eventIds: List<Long>,
-        userId: Long
+        user: User
     ) {
         var totalPrice = BigDecimal.ZERO
         val tickets = mutableListOf<Ticket>()
 
         eventIds.forEach { eventId ->
-            val ticket = ticketService.createTicket(eventId, userId, order)
+            val ticket = ticketService.createTicket(eventId, user, order)
             tickets += ticket
-            totalPrice += ticket.price
+            totalPrice = totalPrice.add(ticket.price)
         }
 
         order.totalPrice = totalPrice
