@@ -29,9 +29,9 @@ class EventController(
     ): EventResponseLong =
         service.createEvent(dto, user)
 
-    @GetMapping("/{eventId}")
+    @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    fun getEventById(@PathVariable eventId: Long): EventResponseLong =
+    fun getEventById(@RequestParam eventId: Long): EventResponseLong =
         service.getEventById(eventId)
 
     @PatchMapping("/{eventId}")

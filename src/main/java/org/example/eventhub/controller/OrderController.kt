@@ -26,9 +26,9 @@ class OrderController(
     ): OrderResponseLong =
         service.createOrder(dto, user)
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    fun getOrderById(@PathVariable orderId: Long): OrderResponseLong =
+    fun getOrderById(@RequestParam orderId: Long): OrderResponseLong =
         service.getOrderById(orderId)
 
     @GetMapping("/my")

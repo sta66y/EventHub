@@ -22,15 +22,23 @@ class UserController(
     fun getAllUsers(pageable: Pageable, filter: UserFilter): Page<UserResponseShort> =
         service.getAllUsers(pageable, filter)
 
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    fun getUserById(@PathVariable userId: Long): UserResponseLong =
-        service.getUserById(userId)
-
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    fun getUserByUsername(@RequestParam username: String): UserResponseLong =
-        service.getUserByUsername(username)
+    fun searchUser(
+        @RequestParam(required = false) userId: Long?,
+        @RequestParam(required = false) username: String?
+    ): UserResponseLong {
+        require(userId != null || username != null) {
+            "Нужно передать userId или username"
+        }
+        require(!(userId != null && username != null)) {
+            "Передавайте только один параметр"
+        }
+
+        return when {
+            userId != null -> service.getUserById(userId)
+            else -> service.getUserByUsername(username!!)
+        }
+    }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
