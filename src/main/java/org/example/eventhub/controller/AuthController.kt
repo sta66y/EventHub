@@ -1,8 +1,9 @@
 package org.example.eventhub.controller
 
 import org.example.eventhub.dto.security.LoginRequest
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.example.eventhub.dto.security.LoginResponse
+import org.example.eventhub.dto.security.RegisterRequest
+import org.example.eventhub.service.AuthService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -11,16 +12,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
-    private val authenticationManager: AuthenticationManager
+    private val service: AuthService
 ) {
 
     @PostMapping("/login")
-    fun login(@RequestBody dto: LoginRequest) {
-        val authToken = UsernamePasswordAuthenticationToken(
-            dto.username,
-            dto.password
-        )
+    fun login(@RequestBody dto: LoginRequest): LoginResponse = service.login(dto)
 
-        authenticationManager.authenticate(authToken)
-    }
+    @PostMapping("/register")
+    fun register(@RequestBody dto: RegisterRequest): LoginResponse = service.register(dto)
 }
