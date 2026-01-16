@@ -22,7 +22,8 @@ class SecurityConfig {
     fun securityFilterChain(
         http: HttpSecurity,
         jwtFilter: JwtAuthenticationFilter,
-        jwtAuthEntryPoint: JwtAuthEntryPoint
+        jwtAuthEntryPoint: JwtAuthEntryPoint,
+        jwtAccessDeniedHandler: JwtAccessDeniedHandler
     ): SecurityFilterChain {
 
         http
@@ -37,6 +38,7 @@ class SecurityConfig {
             }
             .exceptionHandling {
                 it.authenticationEntryPoint(jwtAuthEntryPoint)
+                it.accessDeniedHandler(jwtAccessDeniedHandler)
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
 
