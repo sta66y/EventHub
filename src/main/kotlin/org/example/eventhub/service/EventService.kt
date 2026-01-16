@@ -23,7 +23,7 @@ class EventService(
 ) {
 
     fun createEvent(dto: EventCreateRequest, userDetails: UserDetails): EventResponseLong {
-        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+        val user = userService.getUserByEmailAsEntity(userDetails.username)
         val event = mapper.toEntity(dto, user)
         return mapper.toLongDto(repository.save(event))
     }
@@ -60,7 +60,7 @@ class EventService(
         repository.save(event)
 
     private fun checkAccess(userDetails: UserDetails, event: Event) {
-        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+        val user = userService.getUserByEmailAsEntity(userDetails.username)
 
         if (event.organizer != user)
             throw NoAccessException(

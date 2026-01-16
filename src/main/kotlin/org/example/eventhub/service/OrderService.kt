@@ -31,7 +31,7 @@ class OrderService(
 ) {
 
     fun createOrder(dto: OrderCreateRequest, userDetails: UserDetails): OrderResponseLong {
-        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+        val user = userService.getUserByEmailAsEntity(userDetails.username)
 
         val order = Order(
             user = user,
@@ -104,7 +104,7 @@ class OrderService(
         val tickets = mutableListOf<Ticket>()
 
         eventIds.forEach { eventId ->
-            val ticket = ticketService.createTicket(eventId, user, order)
+            val ticket = ticketService.createTicket(eventId, user, order) //TODO тут ошибка вылетает на тесте
             tickets += ticket
             totalPrice = totalPrice.add(ticket.price)
         }
@@ -117,7 +117,7 @@ class OrderService(
         mapper.toLongDto(getOrderByIdAsEntity(orderId))
 
     fun getAllOrders(userDetails: UserDetails, pageable: Pageable): Page<OrderResponseShort> {
-        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+        val user = userService.getUserByEmailAsEntity(userDetails.username)
 
         return repository.findAllByUserId(user.id, pageable)
             .map(mapper::toShortDto)
@@ -128,7 +128,7 @@ class OrderService(
             .orElseThrow { OrderNotFoundException("Заказа с id $orderId не существует") }
 
     private fun checkAccess(userDetails: UserDetails, order: Order) {
-        val user = userService.getUserByUsernameAsEntity(userDetails.username)
+        val user = userService.getUserByEmailAsEntity(userDetails.username)
 
         if (order.user != user)
             throw NoAccessException(

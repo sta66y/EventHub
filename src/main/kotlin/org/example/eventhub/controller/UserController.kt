@@ -1,8 +1,10 @@
 package org.example.eventhub.controller
 
 import jakarta.validation.Valid
-import org.example.eventhub.dto.security.RegisterRequest
-import org.example.eventhub.dto.user.*
+import org.example.eventhub.dto.user.UserFilter
+import org.example.eventhub.dto.user.UserResponseLong
+import org.example.eventhub.dto.user.UserResponseShort
+import org.example.eventhub.dto.user.UserUpdateRequest
 import org.example.eventhub.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -35,7 +37,7 @@ class UserController(
         }
         require(!(userId != null && username != null)) {
             "Передавайте только один параметр"
-        }
+        }//TODO при ошибке 401
 
         return when {
             userId != null -> service.getUserById(userId)
@@ -57,4 +59,10 @@ class UserController(
     @PreAuthorize("hasAuthority('USER_DELETE')")
     fun deleteUser(@AuthenticationPrincipal user: UserDetails) =
         service.deleteUser(user)
+
+
+//TODO просмотр себя
+    //TODO если перейти на несуществующий эндпоинт ошибка - не авторизован
+            //todo после удалениия чувака токен сохраняется?
+
 }

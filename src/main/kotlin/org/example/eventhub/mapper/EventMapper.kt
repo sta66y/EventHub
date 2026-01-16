@@ -51,7 +51,7 @@ class EventMapper(
         }
 
     fun toLongDto(entity: Event): EventResponseLong =
-        EventResponseLong(
+        _root_ide_package_.org.example.eventhub.dto.event.EventResponseLong(
             id = entity.id,
             title = entity.title,
             description = entity.description,
@@ -64,7 +64,7 @@ class EventMapper(
         )
 
     fun toShortDto(entity: Event): EventResponseShort =
-        EventResponseShort(
+        _root_ide_package_.org.example.eventhub.dto.event.EventResponseShort(
             id = entity.id,
             title = entity.title,
             dateTime = entity.dateTime

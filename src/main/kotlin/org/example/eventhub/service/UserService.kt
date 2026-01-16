@@ -56,7 +56,7 @@ class UserService(
         userDetails: UserDetails,
         dto: UserUpdateRequest
     ): UserResponseLong {
-        val user = getUserByUsernameAsEntity(userDetails.username)
+        val user = getUserByEmailAsEntity(userDetails.username)
 
         dto.username?.takeIf { it != user.username }?.let {
             checkUsernameUnique(it)
@@ -78,7 +78,7 @@ class UserService(
     }
 
     fun deleteUser(userDetails: UserDetails) {
-        val user = getUserByUsernameAsEntity(userDetails.username)
+        val user = getUserByEmailAsEntity(userDetails.username)
         repository.delete(user)
     }
 
@@ -101,4 +101,8 @@ class UserService(
     fun getUserByUsernameAsEntity(username: String): User =
         repository.findByUsername(username)
             .orElseThrow { UserNotFoundException("Пользователь с username $username не найден") }
+
+    fun getUserByEmailAsEntity(email: String): User =
+        repository.findByEmail(email)
+            .orElseThrow { UserNotFoundException("Пользователь с email $email не найден") }
 }

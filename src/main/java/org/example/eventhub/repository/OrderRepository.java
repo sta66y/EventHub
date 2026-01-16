@@ -1,9 +1,7 @@
 package org.example.eventhub.repository;
 
 import org.example.eventhub.entity.Order;
-import org.example.eventhub.entity.Ticket;
 import org.example.eventhub.enums.OrderStatus;
-import org.example.eventhub.enums.TicketStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

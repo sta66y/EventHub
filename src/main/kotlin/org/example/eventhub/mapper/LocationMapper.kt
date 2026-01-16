@@ -16,7 +16,7 @@ class LocationMapper {
         Location(dto.city, dto.street, dto.house, dto.additionalInfo)
 
     fun toLongDto(entity: Location?): LocationResponseLong? =
-        LocationResponseLong(
+        _root_ide_package_.org.example.eventhub.dto.location.LocationResponseLong(
             entity?.city, entity?.street, entity?.house, entity?.additionalInfo
         )
 }

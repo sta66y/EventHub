@@ -22,5 +22,5 @@ spring:
       org.hibernate.orm.jdbc.bind: TRACE
 
 jwt:
-  secret: super-long-random-256-bit-key
+  secret: asdf123kj12h31kj23gkjg1234fjk1234kjKJHGKJGUIYGiuy1g2uy3gjh12g4kjh1g24
   validity: 3600000
