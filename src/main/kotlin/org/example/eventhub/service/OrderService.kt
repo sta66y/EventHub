@@ -46,7 +46,7 @@ class OrderService(
     }
 
     @Scheduled(cron = "0 * * * * *")
-    fun cancelExpiredReservations() {
+    fun cancelExpiredReservations()  {
         val expiredOrders =
             repository.findOrdersByStatusAndReservedUntilBefore(
                 OrderStatus.PENDING,
