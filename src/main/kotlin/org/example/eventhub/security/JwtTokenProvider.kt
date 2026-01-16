@@ -4,9 +4,12 @@ import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.Date
+
+private val log = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
 @Component
 class JwtTokenProvider {
@@ -25,6 +28,8 @@ class JwtTokenProvider {
         username: String,
         authorities: List<String>
     ): String {
+        log.debug("Генерация JWT токена...")
+
        val now = Date()
        val expiry = Date(now.time + validityInMs)
 

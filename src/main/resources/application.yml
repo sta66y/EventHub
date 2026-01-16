@@ -24,3 +24,9 @@ spring:
 jwt:
   secret: asdf123kj12h31kj23gkjg1234fjk1234kjKJHGKJGUIYGiuy1g2uy3gjh12g4kjh1g24
   validity: 3600000
+
+logging:
+  level:
+    root: info
+    org.example.eventhub: debug
+
