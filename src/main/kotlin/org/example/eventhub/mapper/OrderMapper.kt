@@ -12,7 +12,7 @@ class OrderMapper(
 ) {
 
     fun toLongDto(entity: Order): OrderResponseLong =
-        _root_ide_package_.org.example.eventhub.dto.order.OrderResponseLong(
+        OrderResponseLong(
             id = entity.id,
             user = userMapper.toShortDto(entity.user),
             tickets = entity.tickets.map { ticketMapper.toShortDto(it) },
@@ -21,7 +21,7 @@ class OrderMapper(
         )
 
     fun toShortDto(entity: Order): OrderResponseShort =
-        _root_ide_package_.org.example.eventhub.dto.order.OrderResponseShort(
+        OrderResponseShort(
             tickets = entity.tickets.map { ticketMapper.toShortDto(it) },
             totalPrice = entity.totalPrice,
             orderStatus = entity.status
