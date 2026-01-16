@@ -1,6 +1,5 @@
 package org.example.eventhub.dto.event
 
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import org.example.eventhub.dto.location.LocationUpdateRequest
 import org.example.eventhub.enums.EventStatus
@@ -12,7 +11,7 @@ data class EventUpdateRequest(
     val description: String?,
     val dateTime: LocalDateTime?,
     val location: LocationUpdateRequest?,
-    val capacity: @NotNull(message = "capacity обязательна") @Positive(message = "capacity должна быть положительна") Int,
+    val capacity: @Positive(message = "capacity должна быть положительна") Int?,
     val price: BigDecimal?,
     val eventStatus: EventStatus?
 )
