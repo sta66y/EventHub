@@ -30,7 +30,7 @@ class Order(
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

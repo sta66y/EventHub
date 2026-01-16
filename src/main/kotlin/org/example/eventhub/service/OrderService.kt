@@ -37,6 +37,7 @@ class OrderService(
             user = user,
             reservedUntil = LocalDateTime.now().plusMinutes(15),
             totalPrice = BigDecimal.ZERO,
+            createdAt = LocalDateTime.now()
         )
 
         reserveTickets(order, dto.eventsId, user)

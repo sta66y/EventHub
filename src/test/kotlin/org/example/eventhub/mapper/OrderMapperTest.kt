@@ -46,7 +46,8 @@ class OrderMapperTest : StringSpec({
             tickets = mutableListOf(ticket),
             totalPrice = BigDecimal.TEN,
             status = OrderStatus.PAID,
-            reservedUntil = LocalDateTime.now().plusMinutes(15)
+            reservedUntil = LocalDateTime.now().plusMinutes(15),
+            createdAt = LocalDateTime.now()
         )
     }
 

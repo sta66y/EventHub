@@ -7,7 +7,7 @@ import org.example.eventhub.enums.EventStatus
 import org.example.eventhub.exception.NoAvailableTicketsException
 
 @Entity
-class Event(
+class   Event(
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
