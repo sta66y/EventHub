@@ -33,12 +33,12 @@ class OrderService(
     fun createOrder(dto: OrderCreateRequest, userDetails: UserDetails): OrderResponseLong {
         val user = userService.getUserByEmailAsEntity(userDetails.username)
 
-        val order = Order(
+        val order = repository.save(Order(
             user = user,
             reservedUntil = LocalDateTime.now().plusMinutes(15),
             totalPrice = BigDecimal.ZERO,
             createdAt = LocalDateTime.now()
-        )
+        ))
 
         reserveTickets(order, dto.eventsId, user)
 
