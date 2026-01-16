@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class UserMapper{
 
     fun toShortDto(entity: User): UserResponseShort =
-        _root_ide_package_.org.example.eventhub.dto.user.UserResponseShort(entity.username)
+       UserResponseShort(entity.username)
 
     fun toLongDto(entity: User): UserResponseLong =
         UserResponseLong(

@@ -15,8 +15,12 @@ class LocationMapper {
     fun toEntity(dto: LocationUpdateRequest): Location =
         Location(dto.city, dto.street, dto.house, dto.additionalInfo)
 
-    fun toLongDto(entity: Location?): LocationResponseLong? =
-        _root_ide_package_.org.example.eventhub.dto.location.LocationResponseLong(
+    fun toLongDto(entity: Location?): LocationResponseLong? {
+        if (entity == null || entity.city == null && entity.street == null && entity.house == null)
+            return null
+
+        return LocationResponseLong(
             entity?.city, entity?.street, entity?.house, entity?.additionalInfo
         )
+    }
 }

@@ -12,7 +12,7 @@ class TicketMapper (
 ){
 
     fun toLongDto(entity: Ticket): TicketResponseLong =
-        _root_ide_package_.org.example.eventhub.dto.ticket.TicketResponseLong(
+        TicketResponseLong(
             id = entity.id,
             event = eventMapper.toShortDto(entity.event),
             user = userMapper.toShortDto(entity.user),
@@ -22,7 +22,7 @@ class TicketMapper (
         )
 
     fun toShortDto(entity: Ticket): TicketResponseShort =
-        _root_ide_package_.org.example.eventhub.dto.ticket.TicketResponseShort(
+        TicketResponseShort(
             event = eventMapper.toShortDto(entity.event),
             user = userMapper.toShortDto(entity.user),
             ticketStatus = entity.status
