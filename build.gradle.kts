@@ -63,6 +63,14 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core:5.12.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+
+
+
+
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+
 }
 
 tasks.withType<Test> {

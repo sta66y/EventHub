@@ -34,6 +34,18 @@ class SecurityConfig {
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/auth/**").permitAll()
 
+                it.requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/css/**",
+                    "/js/**"
+                ).permitAll()
+
+                it.requestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
+
                 it.anyRequest().authenticated()
             }
             .exceptionHandling {
