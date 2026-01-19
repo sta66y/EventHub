@@ -1,12 +1,12 @@
-package org.example.eventhub.repository;
+package org.example.eventhub.repository
 
-import java.util.Optional;
-import org.example.eventhub.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.example.eventhub.entity.User
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import java.util.*
 
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
-    Optional<User> findByEmail(String email);
+interface UserRepository : JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    fun findByEmail(email: String): Optional<User>
 
-    Optional<User> findByUsername(String username);
+    fun findByUsername(username: String): Optional<User>
 }
