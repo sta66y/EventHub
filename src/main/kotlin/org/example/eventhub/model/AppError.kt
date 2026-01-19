@@ -1,3 +1,7 @@
-package org.example.eventhub.model;
+package org.example.eventhub.model
 
-public record AppError(String message, int code) {}
+data class AppError(
+    val message: String,
+    val status: Int,
+    val details: Map<String, String>? = null
+)
