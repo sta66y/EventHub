@@ -1,6 +1,6 @@
-package org.example.eventhub.enums;
+package org.example.eventhub.enums
 
-public enum TicketStatus {
+enum class TicketStatus {
     RESERVED,
     PAID,
     CANCELLED
