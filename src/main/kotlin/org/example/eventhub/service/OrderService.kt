@@ -105,7 +105,7 @@ class OrderService(
         val tickets = mutableListOf<Ticket>()
 
         eventIds.forEach { eventId ->
-            val ticket = ticketService.createTicket(eventId, user, order) //TODO тут ошибка вылетает на тесте
+            val ticket = ticketService.createTicket(eventId, user, order)
             tickets += ticket
             totalPrice = totalPrice.add(ticket.price)
         }
@@ -120,7 +120,7 @@ class OrderService(
     fun getAllOrders(userDetails: UserDetails, pageable: Pageable): Page<OrderResponseShort> {
         val user = userService.getUserByEmailAsEntity(userDetails.username)
 
-        return repository.findAllByUserId(user.id, pageable)
+        return repository.findAllByUserId(user.id!!, pageable)
             .map(mapper::toShortDto)
     }
 

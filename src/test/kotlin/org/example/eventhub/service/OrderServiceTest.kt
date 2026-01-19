@@ -234,7 +234,7 @@ class OrderServiceTest : StringSpec({
                 OrderStatus.PENDING,
                 any()
             )
-        } returns listOf(order)
+        } returns mutableListOf(order)
 
         service.cancelExpiredReservations()
 
