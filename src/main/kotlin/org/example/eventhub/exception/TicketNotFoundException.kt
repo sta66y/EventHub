@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class TicketNotFoundException extends RuntimeException {
-    public TicketNotFoundException(String message) {
-        super(message);
-    }
-}
+class TicketNotFoundException(message: String) : RuntimeException(message)

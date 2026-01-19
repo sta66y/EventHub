@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
-}
+class UserNotFoundException(message: String) : RuntimeException(message)

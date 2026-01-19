@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class OrderNotFoundException extends RuntimeException {
-    public OrderNotFoundException(String message) {
-        super(message);
-    }
-}
+class OrderNotFoundException(message: String) : RuntimeException(message)

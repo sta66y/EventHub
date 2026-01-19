@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class NoAccessException extends RuntimeException {
-    public NoAccessException(String message) {
-        super(message);
-    }
-}
+class NoAccessException(message: String) : RuntimeException(message)

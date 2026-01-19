@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class NoAvailableTicketsException extends RuntimeException {
-    public NoAvailableTicketsException(String message) {
-        super(message);
-    }
-}
+class NoAvailableTicketsException(message: String) : RuntimeException(message)

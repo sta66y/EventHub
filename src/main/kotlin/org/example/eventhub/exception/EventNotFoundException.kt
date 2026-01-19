@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class EventNotFoundException extends RuntimeException {
-    public EventNotFoundException(String message) {
-        super(message);
-    }
-}
+class EventNotFoundException(message: String) : RuntimeException(message)

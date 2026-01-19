@@ -1,7 +1,3 @@
-package org.example.eventhub.exception;
+package org.example.eventhub.exception
 
-public class EventAlreadyExistsException extends RuntimeException {
-    public EventAlreadyExistsException(String message) {
-        super(message);
-    }
-}
+class EventAlreadyExistsException(message: String) : RuntimeException(message)
