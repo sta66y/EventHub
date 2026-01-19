@@ -1,62 +1,86 @@
-package org.example.eventhub.specification;
+package org.example.eventhub.specification
 
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import org.example.eventhub.dto.user.UserFilter;
-import org.example.eventhub.entity.Event;
-import org.example.eventhub.entity.User;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
+import jakarta.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Root
+import jakarta.persistence.criteria.Subquery
+import org.example.eventhub.dto.user.UserFilter
+import org.example.eventhub.entity.Event
+import org.example.eventhub.entity.User
+import org.example.eventhub.enums.Role
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Component
+import java.util.Locale
 
 @Component
-public class UserSpecification {
+class UserSpecification {
 
-    public Specification<User> withFilter(UserFilter filter) {
-        return (root, query, cb) -> {
+    fun withFilter(filter: UserFilter?): Specification<User> =
+        Specification { root, query, cb ->
+
             if (filter == null) {
-                return cb.conjunction();
+                return@Specification cb.conjunction()
             }
 
-            List<Predicate> predicates = new ArrayList<>();
+            val predicates = mutableListOf<Predicate>()
 
-            if (filter.getUsername() != null && !filter.getUsername().isBlank()) {
-                String lowerUsername = filter.getUsername().toLowerCase(Locale.ROOT);
-                predicates.add(cb.like(cb.lower(root.get("username")), "%" + lowerUsername + "%"));
-            }
-
-            if (filter.getRole() != null) {
-                predicates.add(cb.equal(root.get("role"), filter.getRole()));
-            }
-
-            if (filter.getFromCreatedAt() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filter.getFromCreatedAt()));
-            }
-
-            if (filter.getToCreatedAt() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filter.getToCreatedAt()));
-            }
-
-            if (filter.getMinOrganizedEvents() != null || filter.getMaxOrganizedEvents() != null) {
-                Subquery<Long> subquery = query.subquery(Long.class);
-                Root<Event> eventRoot = subquery.from(Event.class);
-                subquery.select(cb.count(eventRoot));
-                subquery.where(cb.equal(eventRoot.get("organizer"), root));
-
-                if (filter.getMinOrganizedEvents() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(
-                            subquery, filter.getMinOrganizedEvents().longValue()));
+            filter.username
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    predicates += cb.like(
+                        cb.lower(root.get<String>("username")),
+                        "%${it.lowercase(Locale.ROOT)}%"
+                    )
                 }
-                if (filter.getMaxOrganizedEvents() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(
-                            subquery, filter.getMaxOrganizedEvents().longValue()));
+
+            filter.role?.let {
+                predicates += cb.equal(
+                    root.get<Role>("role"),
+                    it
+                )
+            }
+
+            filter.fromCreatedAt?.let {
+                predicates += cb.greaterThanOrEqualTo(
+                    root.get("createdAt"),
+                    it
+                )
+            }
+
+            filter.toCreatedAt?.let {
+                predicates += cb.lessThanOrEqualTo(
+                    root.get("createdAt"),
+                    it
+                )
+            }
+
+            if (filter.minOrganizedEvents != null || filter.maxOrganizedEvents != null) {
+
+                val subquery: Subquery<Long> = query.subquery(Long::class.java)
+                val eventRoot: Root<Event> = subquery.from(Event::class.java)
+
+                subquery.select(cb.count(eventRoot))
+                subquery.where(
+                    cb.equal(
+                        eventRoot.get<User>("organizer"),
+                        root
+                    )
+                )
+
+                filter.minOrganizedEvents?.let {
+                    predicates += cb.greaterThanOrEqualTo(
+                        subquery,
+                        it.toLong()
+                    )
+                }
+
+                filter.maxOrganizedEvents?.let {
+                    predicates += cb.lessThanOrEqualTo(
+                        subquery,
+                        it.toLong()
+                    )
                 }
             }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-    }
+            cb.and(*predicates.toTypedArray())
+        }
 }

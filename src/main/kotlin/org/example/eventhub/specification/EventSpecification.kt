@@ -1,66 +1,79 @@
-package org.example.eventhub.specification;
+package org.example.eventhub.specification
 
-import jakarta.persistence.criteria.Predicate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.example.eventhub.dto.event.EventFilter;
-import org.example.eventhub.entity.Event;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
+import jakarta.persistence.criteria.Predicate
+import org.example.eventhub.dto.event.EventFilter
+import org.example.eventhub.entity.Event
+import org.example.eventhub.entity.Location
+import org.example.eventhub.enums.EventStatus
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
-public class EventSpecification {
+class EventSpecification {
 
-    public Specification<Event> withFilter(EventFilter filter) {
-        return (root, query, cb) -> {
+    fun withFilter(filter: EventFilter?): Specification<Event> =
+        Specification { root, _, cb ->
+
             if (filter == null) {
-                return cb.conjunction();
+                return@Specification cb.conjunction()
             }
 
-            List<Predicate> predicates = new ArrayList<>();
+            val predicates = mutableListOf<Predicate>()
 
-            if (filter.getTitle() != null && !filter.getTitle().isBlank()) {
-                String lowerTitle = filter.getTitle().toLowerCase();
-                predicates.add(cb.like(cb.lower(root.get("title")), "%" + lowerTitle + "%"));
-            }
+            filter.title
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    predicates += cb.like(
+                        cb.lower(root.get("title")),
+                        "%${it.lowercase()}%"
+                    )
+                }
 
-            if (filter.getCity() != null && !filter.getCity().isBlank()) {
-                String lowerCity = filter.getCity().toLowerCase();
-                predicates.add(cb.like(cb.lower(root.get("location").get("city")), "%" + lowerCity + "%"));
-            }
+            filter.city
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    predicates += cb.like(
+                        cb.lower(root.get<Location>("location").get("city")),
+                        "%${it.lowercase()}%"
+                    )
+                }
 
-            if (filter.getMinCapacity() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), filter.getMinCapacity()));
-            }
-            if (filter.getMaxCapacity() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("capacity"), filter.getMaxCapacity()));
-            }
-
-            if (filter.getMinPrice() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filter.getMinPrice()));
-            }
-            if (filter.getMaxPrice() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), filter.getMaxPrice()));
+            filter.minCapacity?.let {
+                predicates += cb.greaterThanOrEqualTo(root.get("capacity"), it)
             }
 
-            if (filter.getEventStatus() != null) {
-                predicates.add(cb.equal(root.get("eventStatus"), filter.getEventStatus()));
+            filter.maxCapacity?.let {
+                predicates += cb.lessThanOrEqualTo(root.get("capacity"), it)
             }
 
-            if (filter.getFromDateTime() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("dateTime"), filter.getFromDateTime()));
+            filter.minPrice?.let {
+                predicates += cb.greaterThanOrEqualTo(root.get("price"), it)
             }
 
-            if (filter.getToDateTime() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("dateTime"), filter.getToDateTime()));
+            filter.maxPrice?.let {
+                predicates += cb.lessThanOrEqualTo(root.get("price"), it)
             }
 
-            if (filter.getUpcoming() != null && filter.getUpcoming()) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("dateTime"), LocalDateTime.now()));
+            filter.eventStatus?.let {
+                predicates += cb.equal(root.get<EventStatus>("eventStatus"), it)
             }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-    }
+            filter.fromDateTime?.let {
+                predicates += cb.greaterThanOrEqualTo(root.get("dateTime"), it)
+            }
+
+            filter.toDateTime?.let {
+                predicates += cb.lessThanOrEqualTo(root.get("dateTime"), it)
+            }
+
+            if (filter.upcoming == true) {
+                predicates += cb.greaterThanOrEqualTo(
+                    root.get("dateTime"),
+                    LocalDateTime.now()
+                )
+            }
+
+            cb.and(*predicates.toTypedArray())
+        }
 }

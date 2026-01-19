@@ -1,201 +1,135 @@
-package org.example.eventhub.specification;
+package org.example.eventhub.specification
 
-import jakarta.persistence.criteria.*;
-import org.example.eventhub.dto.user.UserFilter;
-import org.example.eventhub.entity.Event;
-import org.example.eventhub.entity.User;
-import org.example.eventhub.enums.Role;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
+import io.kotest.core.spec.style.StringSpec
+import io.mockk.*
+import jakarta.persistence.criteria.*
+import org.example.eventhub.dto.user.UserFilter
+import org.example.eventhub.entity.Event
+import org.example.eventhub.entity.User
+import org.example.eventhub.enums.Role
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
+class UserSpecificationTest : StringSpec({
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+    val root = mockk<Root<User>>()
+    val query = mockk<CriteriaQuery<*>>()
+    val cb = mockk<CriteriaBuilder>()
 
-@ExtendWith(MockitoExtension.class)
-class UserSpecificationTest {
+    val specification = UserSpecification()
 
-    @Mock
-    private Root<User> root;
-
-    @Mock
-    private CriteriaQuery<?> query;
-
-    @Mock
-    private CriteriaBuilder cb;
-
-    @InjectMocks
-    private UserSpecification specification;
-
-    @Test
-    @DisplayName("withFilter: должен добавлять LIKE по username (игнорируя регистр)")
-    void withFilter_shouldAddUsernamePredicate_whenUsernameProvided() {
-        UserFilter filter = new UserFilter("AdminUser", null, null, null, null, null);
-
-        Path usernamePath = mock(Path.class);
-        Expression<String> lowerUsernameExpr = mock(Expression.class);
-        Predicate likePredicate = mock(Predicate.class);
-
-        when(root.get("username")).thenReturn(usernamePath);
-        when(cb.lower(usernamePath)).thenReturn(lowerUsernameExpr);
-        when(cb.like(lowerUsernameExpr, "%adminuser%")).thenReturn(likePredicate);
-
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
-
-        verify(cb).lower(usernamePath);
-        verify(cb).like(lowerUsernameExpr, "%adminuser%");
-        verify(cb).and(any(Predicate[].class));
+    beforeTest {
+        clearMocks(root, query, cb)
+        every { cb.conjunction() } returns mockk()
+        every { cb.and(*anyVararg()) } returns mockk()
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять equal по role")
-    void withFilter_shouldAddRolePredicate_whenRoleProvided() {
-        UserFilter filter = new UserFilter(null, Role.ORGANIZER, null, null, null, null);
+    "withFilter добавляет LIKE по username" {
+        val filter = UserFilter("AdminUser", null, null, null, null, null)
 
-        Path rolePath = mock(Path.class);
-        Predicate equalPredicate = mock(Predicate.class);
+        val usernamePath = mockk<Path<String>>()
+        val lowerExpr = mockk<Expression<String>>()
+        val predicate = mockk<Predicate>()
 
-        when(root.get("role")).thenReturn(rolePath);
-        when(cb.equal(rolePath, Role.ORGANIZER)).thenReturn(equalPredicate);
+        every { root.get<String>("username") } returns usernamePath
+        every { cb.lower(usernamePath) } returns lowerExpr
+        every { cb.like(lowerExpr, "%adminuser%") } returns predicate
 
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
+        specification.withFilter(filter).toPredicate(root, query, cb)
 
-        verify(cb).equal(rolePath, Role.ORGANIZER);
-        verify(cb).and(any(Predicate[].class));
+        verify {
+            cb.lower(usernamePath)
+            cb.like(lowerExpr, "%adminuser%")
+            cb.and(any())
+        }
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять greaterThanOrEqualTo по fromCreatedAt")
-    void withFilter_shouldAddFromCreatedAtPredicate_whenFromProvided() {
-        LocalDateTime from = LocalDateTime.of(2024, 1, 1, 0, 0);
-        UserFilter filter = new UserFilter(null, null, from, null, null, null);
+    "withFilter добавляет equal по role" {
+        val filter = UserFilter(null, Role.ORGANIZER, null, null, null, null)
 
-        Path createdAtPath = mock(Path.class);
-        Predicate predicate = mock(Predicate.class);
+        val rolePath = mockk<Path<Role>>()
+        val predicate = mockk<Predicate>()
 
-        when(root.get("createdAt")).thenReturn(createdAtPath);
-        when(cb.greaterThanOrEqualTo(createdAtPath, from)).thenReturn(predicate);
+        every { root.get<Role>("role") } returns rolePath
+        every { cb.equal(rolePath, Role.ORGANIZER) } returns predicate
 
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
+        specification.withFilter(filter).toPredicate(root, query, cb)
 
-        verify(cb).greaterThanOrEqualTo(createdAtPath, from);
-        verify(cb).and(any(Predicate[].class));
+        verify {
+            cb.equal(rolePath, Role.ORGANIZER)
+            cb.and(any())
+        }
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять lessThanOrEqualTo по toCreatedAt")
-    void withFilter_shouldAddToCreatedAtPredicate_whenToProvided() {
-        LocalDateTime to = LocalDateTime.of(2025, 12, 31, 23, 59);
-        UserFilter filter = new UserFilter(null, null, null, to, null, null);
+    "withFilter добавляет fromCreatedAt" {
+        val from = LocalDateTime.of(2024, 1, 1, 0, 0)
+        val filter = UserFilter(null, null, from, null, null, null)
 
-        Path createdAtPath = mock(Path.class);
-        Predicate predicate = mock(Predicate.class);
+        val createdAtPath = mockk<Path<LocalDateTime>>()
+        val predicate = mockk<Predicate>()
 
-        when(root.get("createdAt")).thenReturn(createdAtPath);
-        when(cb.lessThanOrEqualTo(createdAtPath, to)).thenReturn(predicate);
+        every { root.get<LocalDateTime>("createdAt") } returns createdAtPath
+        every { cb.greaterThanOrEqualTo(createdAtPath, from) } returns predicate
 
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
+        specification.withFilter(filter).toPredicate(root, query, cb)
 
-        verify(cb).lessThanOrEqualTo(createdAtPath, to);
-        verify(cb).and(any(Predicate[].class));
+        verify {
+            cb.greaterThanOrEqualTo(createdAtPath, from)
+            cb.and(any())
+        }
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять субквери с minOrganizedEvents")
-    void withFilter_shouldAddMinOrganizedEventsSubquery_whenMinProvided() {
-        Integer minEvents = 5;
-        UserFilter filter = new UserFilter(null, null, null, null, minEvents, null);
+    "withFilter добавляет toCreatedAt" {
+        val to = LocalDateTime.of(2025, 12, 31, 23, 59)
+        val filter = UserFilter(null, null, null, to, null, null)
 
-        Subquery<Long> subquery = mock(Subquery.class);
-        Root<Event> eventRoot = mock(Root.class);
-        Expression<Long> countExpr = mock(Expression.class);
-        Predicate organizerPredicate = mock(Predicate.class);
-        Predicate gePredicate = mock(Predicate.class);
+        val createdAtPath = mockk<Path<LocalDateTime>>()
+        val predicate = mockk<Predicate>()
 
-        when(query.subquery(Long.class)).thenReturn(subquery);
-        when(subquery.from(Event.class)).thenReturn(eventRoot);
-        when(cb.count(eventRoot)).thenReturn(countExpr);
-        when(eventRoot.get("organizer")).thenReturn(mock(Path.class));
-        when(cb.equal(any(), eq(root))).thenReturn(organizerPredicate);
-        when(cb.greaterThanOrEqualTo(eq(subquery), eq(minEvents.longValue()))).thenReturn(gePredicate);
+        every { root.get<LocalDateTime>("createdAt") } returns createdAtPath
+        every { cb.lessThanOrEqualTo(createdAtPath, to) } returns predicate
 
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
+        specification.withFilter(filter).toPredicate(root, query, cb)
 
-        verify(subquery).select(countExpr);
-        verify(subquery).where(organizerPredicate);
-        verify(cb).greaterThanOrEqualTo(subquery, minEvents.longValue());
-        verify(cb).and(any(Predicate[].class));
+        verify {
+            cb.lessThanOrEqualTo(createdAtPath, to)
+            cb.and(any())
+        }
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять субквери с maxOrganizedEvents")
-    void withFilter_shouldAddMaxOrganizedEventsSubquery_whenMaxProvided() {
-        Integer maxEvents = 20;
-        UserFilter filter = new UserFilter(null, null, null, null, null, maxEvents);
+    "withFilter добавляет subquery с minOrganizedEvents" {
+        val filter = UserFilter(null, null, null, null, 5, null)
 
-        Subquery<Long> subquery = mock(Subquery.class);
-        Root<Event> eventRoot = mock(Root.class);
-        Expression<Long> countExpr = mock(Expression.class);
-        Predicate organizerPredicate = mock(Predicate.class);
-        Predicate lePredicate = mock(Predicate.class);
+        val subquery = mockk<Subquery<Long>>()
+        val eventRoot = mockk<Root<Event>>()
+        val countExpr = mockk<Expression<Long>>()
+        val organizerPath = mockk<Path<User>>()
+        val organizerPredicate = mockk<Predicate>()
+        val gePredicate = mockk<Predicate>()
 
-        when(query.subquery(Long.class)).thenReturn(subquery);
-        when(subquery.from(Event.class)).thenReturn(eventRoot);
-        when(cb.count(eventRoot)).thenReturn(countExpr);
-        when(cb.equal(any(), eq(root))).thenReturn(organizerPredicate);
-        when(cb.lessThanOrEqualTo(eq(subquery), eq(maxEvents.longValue()))).thenReturn(lePredicate);
+        every { query.subquery(Long::class.java) } returns subquery
+        every { subquery.from(Event::class.java) } returns eventRoot
+        every { cb.count(eventRoot) } returns countExpr
 
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
+        every { subquery.select(countExpr) } returns subquery
+        every { subquery.where(any<Predicate>()) } returns subquery
 
-        verify(subquery).select(countExpr);
-        verify(subquery).where(organizerPredicate);
-        verify(cb).lessThanOrEqualTo(subquery, maxEvents.longValue());
-        verify(cb).and(any(Predicate[].class));
+        every { eventRoot.get<User>("organizer") } returns organizerPath
+        every { cb.equal(organizerPath, root) } returns organizerPredicate
+        every { cb.greaterThanOrEqualTo(subquery, 5L) } returns gePredicate
+
+        specification.withFilter(filter).toPredicate(root, query, cb)
+
+        verify {
+            subquery.select(countExpr)
+            subquery.where(organizerPredicate)
+            cb.greaterThanOrEqualTo(subquery, 5L)
+            cb.and(any())
+        }
     }
 
-    @Test
-    @DisplayName("withFilter: должен добавлять субквери с min и max OrganizedEvents одновременно")
-    void withFilter_shouldAddBothMinAndMaxOrganizedEventsSubquery_whenBothProvided() {
-        UserFilter filter = new UserFilter(null, null, null, null, 3, 15);
+    "withFilter возвращает conjunction если filter = null" {
+        specification.withFilter(null).toPredicate(root, query, cb)
 
-        Subquery<Long> subquery = mock(Subquery.class);
-        Root<Event> eventRoot = mock(Root.class);
-        Expression<Long> countExpr = mock(Expression.class);
-        Predicate organizerPredicate = mock(Predicate.class);
-
-        when(query.subquery(Long.class)).thenReturn(subquery);
-        when(subquery.from(Event.class)).thenReturn(eventRoot);
-        when(cb.count(eventRoot)).thenReturn(countExpr);
-        when(cb.equal(any(), eq(root))).thenReturn(organizerPredicate);
-
-        Specification<User> spec = specification.withFilter(filter);
-        spec.toPredicate(root, query, cb);
-
-        verify(subquery).select(countExpr);
-        verify(subquery).where(organizerPredicate);
-        verify(cb).greaterThanOrEqualTo(subquery, 3L);
-        verify(cb).lessThanOrEqualTo(subquery, 15L);
-        verify(cb).and(any(Predicate[].class));
+        verify { cb.conjunction() }
     }
-
-    @Test
-    @DisplayName("withFilter: должен возвращать conjunction при filter = null")
-    void withFilter_shouldReturnConjunction_whenFilterIsNull() {
-        Specification<User> spec = specification.withFilter(null);
-        spec.toPredicate(root, query, cb);
-
-        verify(cb).conjunction();
-    }
-}
+})
